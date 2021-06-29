@@ -14,7 +14,8 @@ from optparse import OptionParser, OptionValueError
 usage = "usage: python runTauDisplay_BsTauTau.py"
 parser = OptionParser(usage)
 parser.add_option("-t", "--type", default='ult', type="string", help="type [rate, eff, anal, ult]", dest="type")
-parser.add_option('-w', '--weight', action="store_true", default=False, dest='weight')
+parser.add_option('-w', '--weight', action="store_true", default=True, dest='weight')
+parser.add_option("-l", "--lumi", default=1.0, type="float", help="target lumi. with [E34]", dest="lumi")
 (options, args) = parser.parse_args()
 
 def draw(name, xtitle, ytitle, graphs, y_min, y_max, option='rt'):
@@ -41,8 +42,8 @@ def draw(name, xtitle, ytitle, graphs, y_min, y_max, option='rt'):
         leg.AddEntry(graph, graph.GetName(), 'lep')
 
     leg.Draw()
-    can.SaveAs('plots/' + name + '.pdf')
-    can.SaveAs('plots/' + name + '.gif')
+    can.SaveAs('plots/' + name + '_' + str(options.lumi).replace('.','p') + '.pdf')
+    can.SaveAs('plots/' + name + '_' + str(options.lumi).replace(',','p') + '.gif')
 
 def returnGraph(name, eff, rate):
     graph = TGraph()
@@ -231,7 +232,7 @@ vardict = {
 ensureDir('plots/')
 
 sfile_eff = TFile('plot_' + options.type + '.root')
-sfile_rate = TFile('plot_rate.root')
+sfile_rate = TFile('plot_rate_L' + str(options.lumi).replace('.','p') + '.root')
 
 
 print sfile_eff, sfile_rate
@@ -298,6 +299,42 @@ for ii, vkey in enumerate(['DoubleE_dR']):
     graphs_DoubleE_dR.append(copy.deepcopy(graph_DoubleE_dR))
 
 
+graphs_DoubleE_dR_dyn = []
+
+#for ii, vkey in enumerate(['DoubleE_dR', 'DoubleE_dR_1p5']):
+for ii, vkey in enumerate(['DoubleE_dR_dyn']):
+
+    eff_DoubleE_dR_dyn = sfile_eff.Get(vkey)
+    rate_DoubleE_dR_dyn = sfile_rate.Get(vkey)
+
+    graph_DoubleE_dR_dyn = returnGraph(vkey, eff_DoubleE_dR_dyn, rate_DoubleE_dR_dyn)
+
+#    graph_DoubleE_dR.SetName(vkey)
+    graphs_DoubleE_dR_dyn.append(copy.deepcopy(graph_DoubleE_dR_dyn))
+
+
+
+graphs_MuEE = []
+for ipt_mu, pt_mu in enumerate([4]):
+        
+    eff_MuEE = sfile_eff.Get('MuEE_mu' + str(pt_mu))
+    rate_MuEE = sfile_rate.Get('MuEE_mu' + str(pt_mu))
+
+    graph_MuEE = returnGraph('MuEE_mu' + str(pt_mu), eff_MuEE, rate_MuEE)
+    
+    graphs_MuEE.append(graph_MuEE)
+
+
+graphs_asymEE = []
+for ipt1, pt_e1 in enumerate([7,8,9,10]):
+    eff_asymEE = sfile_eff.Get('asym_E' + str(pt_e1))
+    rate_asymEE = sfile_rate.Get('asym_E' + str(pt_e1))
+
+    graph_asymEE = returnGraph('asym_E' + str(pt_e1), eff_asymEE, rate_asymEE)
+    
+
+    graphs_asymEE.append(graph_asymEE)
+    
 
 #if options.type == 'eff':
 #
@@ -349,7 +386,7 @@ elif options.type == 'ult':
     else :
         frame_roc.GetXaxis().SetTitle('L1 Trigger efficiency x Signal Acc.')
 
-frame_roc.GetYaxis().SetTitle('Rate @ 1E34')
+frame_roc.GetYaxis().SetTitle('Rate @ ' + str(options.lumi) + 'E34' )
 frame_roc.Draw()
 
 leg = TLegend(0.2, 0.7,0.5,0.86)
@@ -368,11 +405,6 @@ for graph in graphs_singleMu:
     graph.Draw('plsame')
     #leg.AddEntry(graph, 'Single #mu > X GeV, |#eta| < 1.5', 'lep')
     leg.AddEntry(graph, 'Mu (4,1.5)', 'lep')
-
-#for graph in graphs_singleMuE:
-#    graph.SetLineColor(2)
-#    graph.Write()
-#    graph.Draw('plsame')
 
 for graph in graphs_singleMuE:
     graph.SetLineColor(2)
@@ -393,15 +425,6 @@ for graph in graphs_singleMuEE:
     graph.Draw('plsame')
     leg.AddEntry(graph, 'Mu (4,1.5) + EE (X,1.0;dR<1)', 'lep')
 
-for igraph,graph in enumerate(graphs_singleMuEEa):
-    graph.SetLineColor(6)
-    graph.SetMarkerColor(6)
-    graph.SetMarkerStyle(25)
-    graph.SetMarkerSize(1)
-    graph.Write()
-    graph.Draw('plsame')
-    if igraph == 0 : leg.AddEntry(graph, 'Mu (4,1.5) + E1 (X,1.0)  + E2 (Y,1.0;Y<X)', 'lep')
-
 for graph in graphs_DoubleE_dR:
     graph.SetLineColor(4)
     graph.SetMarkerColor(4)
@@ -412,8 +435,44 @@ for graph in graphs_DoubleE_dR:
     #leg.AddEntry(graph, 'Double e (p_{T} #geq X GeV, #eta < 1.0) + dR < 1', 'lep')
     leg.AddEntry(graph, 'EE (X,1.0;dR<1)', 'lep')
 
+for graph in graphs_DoubleE_dR_dyn:
+    graph.SetLineColor(6)
+    graph.SetMarkerColor(6)
+    graph.SetMarkerStyle(24)
+    graph.SetMarkerSize(1)
+    graph.Write()
+    graph.Draw('plsame')
+    leg.AddEntry(graph, 'Double e (p_{T} #geq X GeV, #eta < 1.0) + dR dynamic', 'lep')
+    #leg.AddEntry(graph, 'EE (X,1.0;dR<0.4-1.0)', 'lep')
 
+#for graph in graphs_MuEE:
+#    graph.SetLineColor(8)
+#    graph.SetMarkerColor(8)
+#    graph.SetMarkerStyle(24)
+#    graph.SetMarkerSize(1)
+#    graph.Write()
+#    graph.Draw('plsame')
+#    leg.AddEntry(graph, 'mu (p_{T} #geq 4 GeV, #eta < 2.4) + Double e (p_{T} #geq X GeV, #eta < 2.4)', 'lep')
+#    #leg.AddEntry(graph, 'Mu (4,2.4) + E1 (X,2.4)  + E2 (Y,2.4;Y<X)', 'lep')
+
+###idx = 0
+###
+###colors = [1, 6, 8, 2]
+###
+###for graph in graphs_asymEE:
+###    graph.SetLineColor(colors[idx])
+###    graph.SetMarkerColor(colors[idx])
+###    graph.SetLineStyle(2)
+###    graph.SetMarkerStyle(24)
+###    graph.SetMarkerSize(1)
+###    graph.Write()
+###    graph.Draw('plsame')
+###    leg.AddEntry(graph, 'e1 (p_{T} #geq ' + graph.GetName().replace('asym_E', '') + ' GeV, #eta < 1.0) + e2 (p_{T} #geq Y GeV, #eta < 1.0), dR < 1', 'lep')
+###
+###    idx+=1
+    
 leg.Draw()
-canvas.SaveAs('plots/roc_' + options.type + '.pdf')
+canvas.SaveAs('plots/roc_' + options.type + '_L' + str(options.lumi).replace('.','p') + '.gif')
+canvas.SaveAs('plots/roc_' + options.type + '_L' + str(options.lumi).replace('.','p') + '.pdf')
 ofile.Write()
 ofile.Close()

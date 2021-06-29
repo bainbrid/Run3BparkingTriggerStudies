@@ -12,34 +12,23 @@ from optparse import OptionParser, OptionValueError
 usage = "usage: python runTauDisplay_BsTauTau.py" 
 parser = OptionParser(usage)  
 
-parser.add_option("-r", "--runnum", default='322079', type="string", help="runnum", dest="runnum") 
-parser.add_option("-l", "--lumi", default='L1p8', type="string", help="lumi", dest="lumi") 
+#parser.add_option("-r", "--runnum", default='322079', type="string", help="runnum", dest="runnum") 
+parser.add_option("-i", "--input", default="/pnfs/psi.ch/cms/trivcat/store/user/ytakahas/Trigger/job/Run_322079/Myroot_0.root", type="string", help="input", dest="input") 
+parser.add_option("-o", "--output", default="test.root", type="string", help="output", dest="output")
 
 (options, args) = parser.parse_args()  
 
 print options
 
 
-chain = TChain('l1UpgradeEmuTree/L1UpgradeTree', 'tree')
-#chain = TChain('l1UpgradeTree/L1UpgradeTree', 'tree')
+chain = TChain('l1Tree', 'tree')
 
-#for line in open('../ntuple/Run3_NuGun_MC_ntuples.list', 'r'):
-#runnum = 322088
+chain.Add(options.input)
 
-for line in open('fileList/' + options.runnum + '_' + options.lumi + '.txt', 'r'):
-    line = line.rstrip()
+#chain = TChain('l1UpgradeEmuTree/L1UpgradeTree', 'tree')
 
-    if line.find('.root')==-1: continue
+#chain.Add('L1Ntuple_10.root')
 
-    print line
-    chain.AddFile(line)
-
-
-#chain.AddFile('/eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/bundocka/condor/reHcalTP_PFA1p_Nu_110X_105p12_mufix_1620043913/9.root')
-
-chain.SetBranchStatus('*', 0)
-chain.SetBranchStatus('muon*', 1)
-chain.SetBranchStatus('eg*', 1)
 
 Nevt = chain.GetEntries()
 
@@ -47,132 +36,275 @@ print Nevt, 'events detected'
 
 
 
-
-##################################################
-#handle  = Handle ('std::vector<reco::GenParticle>')
-#label = ("genParticles")
-
-#handle_e  = Handle ('BXVector<l1t::EGamma>')
-#label_e = ("gtStage2Digis", "EGamma")
-
-#handle_mu  = Handle ('BXVector<l1t::Muon>')
-#label_mu = ("gtStage2Digis", "Muon")
-
-##################################################
-
 nevents = 0
 
-out = TreeProducer('rate_' + options.runnum + '_' + options.lumi + '.root')
+out = TreeProducer(options.output)
 
-ptrange = np.arange(3, 11, 1).tolist() 
+ptrange = np.arange(3, 15, 1).tolist() 
+
+drdict = {
+    3:1,
+    4:1,
+    5:1,
+    6:1,
+    7:1,
+    8:0.8,
+    9:0.7,
+    10:0.65,
+    11:0.6,
+    12:0.55,
+    13:0.5,
+    14:0.45,
+}
 
 
 for evt in xrange(Nevt):
     chain.GetEntry(evt)
 
-    if evt%1000==0: print('{0:.2f}'.format(Double(evt)/Double(Nevt)*100.), '% processed')
+    if evt%10000==0: print('{0:.2f}'.format(Double(evt)/Double(Nevt)*100.), '% processed')
+
+    if chain.npu==-1:
+        print 'This is not in golden-json!'
+        continue
 
 
-#    L1_muons = [(chain.muonEt[i], chain.muonEta[i], chain.muonPhi[i], chain.muonQual[i]) for i in range(len(chain.muonEt)) if chain.muonQual[i] >= 12]
-    L1_muons = [(chain.muonEt[i], chain.muonEta[i], chain.muonPhi[i]) for i in range(len(chain.muonEt)) if chain.muonQual[i] >= 12 and abs(chain.muonEta[i]) < 1.5]
-
-#    L1_electrons = [(chain.egEt[i], chain.egEta[i], chain.egPhi[i]) for i in range(len(chain.egEt))]
-
-    L1_electrons = [(chain.egEt[i], chain.egEta[i], chain.egPhi[i]) for i in range(len(chain.egEt)) if abs(chain.egEta[i]) < 1.]
+#    if evt==10000: break
 
 
-#    print 'mu', L1_muons
-#    print 'e', L1_electrons
-#    print 'e1p5', L1_electrons_1p0
+#    L1_muons_eta1p5 = [(chain.muonEt[i], chain.muonEta[i], chain.muonPhi[i]) for i in range(len(chain.muonEt)) if chain.muonQual[i] >= 12 and abs(chain.muonEta[i]) < 1.5]
+#    L1_muons_eta2p4 = [(chain.muonEt[i], chain.muonEta[i], chain.muonPhi[i]) for i in range(len(chain.muonEt)) if chain.muonQual[i] >= 12 and abs(chain.muonEta[i]) < 2.4]
+#
+#    L1_electrons_eta1p0 = [(chain.egEt[i], chain.egEta[i], chain.egPhi[i]) for i in range(len(chain.egEt)) if abs(chain.egEta[i]) < 1.]
+#    L1_electrons_eta1p5 = [(chain.egEt[i], chain.egEta[i], chain.egPhi[i]) for i in range(len(chain.egEt)) if abs(chain.egEta[i]) < 1.5]
+#    L1_electrons_eta2p4 = [(chain.egEt[i], chain.egEta[i], chain.egPhi[i]) for i in range(len(chain.egEt)) if abs(chain.egEta[i]) < 2.4]
+#
+#
+#    L1_muons_eta1p5 = sorted(L1_muons_eta1p5, key = lambda mu : mu[0], reverse = True)
+#    L1_muons_eat2p4 = sorted(L1_muons_eta2p4, key = lambda mu : mu[0], reverse = True)
+#    L1_electrons_eta1p0 = sorted(L1_electrons_eta1p0, key = lambda e : e[0], reverse = True)
+#    L1_electrons_eta1p5 = sorted(L1_electrons_eta1p5, key = lambda e : e[0], reverse = True)
+#    L1_electrons_eta2p4 = sorted(L1_electrons_eta2p4, key = lambda e : e[0], reverse = True)
 
-#    break
 
-    L1_muons = sorted(L1_muons, key = lambda mu : mu[0], reverse = True)
-    L1_electrons = sorted(L1_electrons, key = lambda e : e[0], reverse = True)
 
-#    L1_muons_1p5 = sorted([mu for mu in L1_muons if abs(mu.eta()) < 1.5], key = lambda mu : mu.pt(), reverse = True)
-#    L1_electrons_1p0 = sorted([e for e in L1_electrons if abs(e.eta()) < 1.0], key = lambda e : e.pt(), reverse = True)
 
-#    import pdb; pdb.set_trace()
 
-    out.nmuons[0] = len(L1_muons)
-#    out.nmuons_1p5[0] = len(L1_muons_1p5)
+    L1_muons_eta1p5 = [(chain.l1mu_pt[i], chain.l1mu_eta[i], chain.l1mu_phi[i]) for i in range(chain.nrMuons) if chain.l1mu_hwQual[i] >= 12 and abs(chain.l1mu_eta[i]) < 1.5]
 
-    out.nelectrons[0] = len(L1_electrons)
-#    out.nelectrons_1p0[0] = len(L1_electrons_1p0)
+    L1_muons_eta2p4 = [(chain.l1mu_pt[i], chain.l1mu_eta[i], chain.l1mu_phi[i]) for i in range(chain.nrMuons) if chain.l1mu_hwQual[i] >= 12 and abs(chain.l1mu_eta[i]) < 2.4]
 
-    if out.nmuons[0]!=0:
-        out.mu1_pt[0] = L1_muons[0][0]
-        out.mu1_eta[0] = L1_muons[0][1]
+
+    L1_electrons_eta1p0 = [(chain.l1eg_pt[i], chain.l1eg_eta[i], chain.l1eg_phi[i]) for i in range(chain.nrEGs) if abs(chain.l1eg_eta[i]) < 1.]
+
+    L1_electrons_eta1p5 = [(chain.l1eg_pt[i], chain.l1eg_eta[i], chain.l1eg_phi[i]) for i in range(chain.nrEGs) if abs(chain.l1eg_eta[i]) < 1.5]
+
+    L1_electrons_eta2p4 = [(chain.l1eg_pt[i], chain.l1eg_eta[i], chain.l1eg_phi[i]) for i in range(chain.nrEGs) if abs(chain.l1eg_eta[i]) < 2.4]
+
+
+    L1_muons_eta1p5 = sorted(L1_muons_eta1p5, key = lambda mu : mu[0], reverse = True)
+    L1_muons_eat2p4 = sorted(L1_muons_eta2p4, key = lambda mu : mu[0], reverse = True)
+    L1_electrons_eta1p0 = sorted(L1_electrons_eta1p0, key = lambda e : e[0], reverse = True)
+    L1_electrons_eta1p5 = sorted(L1_electrons_eta1p5, key = lambda e : e[0], reverse = True)
+    L1_electrons_eta2p4 = sorted(L1_electrons_eta2p4, key = lambda e : e[0], reverse = True)
+
+
+
+    out.nmuons_eta1p5[0] = len(L1_muons_eta1p5)
+    out.nmuons_eta2p4[0] = len(L1_muons_eta2p4)
+
+    out.nelectrons_eta1p0[0] = len(L1_electrons_eta1p0)
+    out.nelectrons_eta1p5[0] = len(L1_electrons_eta1p5)
+    out.nelectrons_eta2p4[0] = len(L1_electrons_eta2p4)
+
+
+    out.instL[0] = chain.instL
+    out.npu[0] = chain.npu
+
+    if out.nmuons_eta1p5[0]!=0:
+        out.mu1_eta1p5_pt[0] = L1_muons_eta1p5[0][0]
+        out.mu1_eta1p5_eta[0] = L1_muons_eta1p5[0][1]
+        out.mu1_eta1p5_phi[0] = L1_muons_eta1p5[0][2]
     else:
-        out.mu1_pt[0] = -1
-        out.mu1_eta[0] = -1
+        out.mu1_eta1p5_pt[0] = -1
+        out.mu1_eta1p5_eta[0] = -1
+        out.mu1_eta1p5_phi[0] = -1
+
+    if out.nmuons_eta2p4[0]!=0:
+        out.mu1_eta2p4_pt[0] = L1_muons_eta2p4[0][0]
+        out.mu1_eta2p4_eta[0] = L1_muons_eta2p4[0][1]
+        out.mu1_eta2p4_phi[0] = L1_muons_eta2p4[0][2]
+    else:
+        out.mu1_eta2p4_pt[0] = -1
+        out.mu1_eta2p4_eta[0] = -1
+        out.mu1_eta2p4_phi[0] = -1
+
 
         
-    if out.nelectrons[0]!=0:
-        out.e1_pt[0] = L1_electrons[0][0]
-        out.e1_eta[0] = L1_electrons[0][1]
+    if out.nelectrons_eta1p0[0]!=0:
+        out.e1_eta1p0_pt[0] = L1_electrons_eta1p0[0][0]
+        out.e1_eta1p0_eta[0] = L1_electrons_eta1p0[0][1]
+        out.e1_eta1p0_phi[0] = L1_electrons_eta1p0[0][2]
     else:
-        out.e1_pt[0] = -1
-        out.e1_eta[0] = -1
+        out.e1_eta1p0_pt[0] = -1
+        out.e1_eta1p0_eta[0] = -1
+        out.e1_eta1p0_phi[0] = -1
+
+    if out.nelectrons_eta1p0[0]>1:
+        out.e2_eta1p0_pt[0] = L1_electrons_eta1p0[1][0]
+        out.e2_eta1p0_eta[0] = L1_electrons_eta1p0[1][1]
+        out.e2_eta1p0_phi[0] = L1_electrons_eta1p0[1][2]
+    else:
+        out.e2_eta1p0_pt[0] = -1
+        out.e2_eta1p0_eta[0] = -1
+        out.e2_eta1p0_phi[0] = -1
 
 
 
-    if out.nelectrons[0]>1:
+    if out.nelectrons_eta1p5[0]!=0:
+        out.e1_eta1p5_pt[0] = L1_electrons_eta1p5[0][0]
+        out.e1_eta1p5_eta[0] = L1_electrons_eta1p5[0][1]
+        out.e1_eta1p5_phi[0] = L1_electrons_eta1p5[0][2]
+    else:
+        out.e1_eta1p5_pt[0] = -1
+        out.e1_eta1p5_eta[0] = -1
+        out.e1_eta1p5_phi[0] = -1
+
+    if out.nelectrons_eta1p5[0]>1:
+        out.e2_eta1p5_pt[0] = L1_electrons_eta1p5[1][0]
+        out.e2_eta1p5_eta[0] = L1_electrons_eta1p5[1][1]
+        out.e2_eta1p5_phi[0] = L1_electrons_eta1p5[1][2]
+    else:
+        out.e2_eta1p5_pt[0] = -1
+        out.e2_eta1p5_eta[0] = -1
+        out.e2_eta1p5_phi[0] = -1
 
 
-        for pt in ptrange:
+
+    if out.nelectrons_eta2p4[0]!=0:
+        out.e1_eta2p4_pt[0] = L1_electrons_eta2p4[0][0]
+        out.e1_eta2p4_eta[0] = L1_electrons_eta2p4[0][1]
+        out.e1_eta2p4_phi[0] = L1_electrons_eta2p4[0][2]
+    else:
+        out.e1_eta2p4_pt[0] = -1
+        out.e1_eta2p4_eta[0] = -1
+        out.e1_eta2p4_phi[0] = -1
+
+    if out.nelectrons_eta2p4[0]>1:
+        out.e2_eta2p4_pt[0] = L1_electrons_eta2p4[1][0]
+        out.e2_eta2p4_eta[0] = L1_electrons_eta2p4[1][1]
+        out.e2_eta2p4_phi[0] = L1_electrons_eta2p4[1][2]
+    else:
+        out.e2_eta2p4_pt[0] = -1
+        out.e2_eta2p4_eta[0] = -1
+        out.e2_eta2p4_phi[0] = -1
+
+
+
+
+
+
+
+    for pt in ptrange:
+
+        flag = False
+
+        for ii, e1 in enumerate(L1_electrons_eta1p5):
+             
+            if flag: break
+
+            for jj, e2 in enumerate(L1_electrons_eta1p5):
+
+
+                if jj <= ii: continue
+
+                if e1[0] >= pt and e2[0] >= pt and deltaR(e1[1], e1[2], e2[1], e2[2]) < 1.:
+                        
+                    flag = True
+                     
+                    break
+
+        getattr(out, 'doubleE' + str(pt) + '_eta1p5')[0] = flag
+
+
+
+    for pt in ptrange:
+
+        flag = False
+
+        for ii, e1 in enumerate(L1_electrons_eta1p0):
+
+            if flag: break
+
+            for jj, e2 in enumerate(L1_electrons_eta1p0):
+
+
+                if jj <= ii: continue
+
+                if e1[0] >= pt and e2[0] >= pt and deltaR(e1[1], e1[2], e2[1], e2[2]) < 1.:
+                        
+                    flag = True
+
+                    break
+
+
+        getattr(out, 'doubleE' + str(pt) + '_eta1p0')[0] = flag
+
+
+
+
+    for pt in ptrange:
+
+        flag = False
+
+        for ii, e1 in enumerate(L1_electrons_eta1p0):
+            
+            if flag: break
+
+            for jj, e2 in enumerate(L1_electrons_eta1p0):
+
+
+                if jj <= ii: continue
+
+
+                if e1[0] >= pt and e2[0] >= pt and deltaR(e1[1], e1[2], e2[1], e2[2]) < Double(drdict[pt]):
+                        
+                    flag = True
+                    break
+                        
+
+        getattr(out, 'dyn_doubleE' + str(pt) + '_eta1p0')[0] = flag
+
+
+
+
+    for pt1 in ptrange:
+        for pt2 in ptrange:
+
+            if pt2 >= pt1: continue
+
 
             flag = False
-
-            for ii, e1 in enumerate(L1_electrons):
-
-#                print pt, e1[0], e1[1], e1[2]
+                
+            for ii, e1 in enumerate(L1_electrons_eta1p0):
 
                 if flag: break
 
-                for jj, e2 in enumerate(L1_electrons):
+                for jj, e2 in enumerate(L1_electrons_eta1p0):
 
 
-                    if jj >= ii: continue
+                    if jj <= ii: continue
 
-#                    print ii,jj
-
-                    if e1[0] >= pt and e2[0] >= pt and deltaR(e1[1], e1[2], e2[1], e2[2]) < 1.:
+                        
+                    if e1[0] >= pt1 and e2[0] >= pt2 and deltaR(e1[1], e1[2], e2[1], e2[2]) < 1.:
                         
                         flag = True
-
+                        
                         break
 
 
+            getattr(out, 'E' + str(pt1) + '_eta1p0_E' + str(pt2) + '_eta1p0' )[0] = flag
             
-            if pt==3:
-                out.doubleE3[0] = flag
-            elif pt==4:
-                out.doubleE4[0] = flag
-            elif pt==5:
-                out.doubleE5[0] = flag
-            elif pt==6:
-                out.doubleE6[0] = flag
-            elif pt==7:
-                out.doubleE7[0] = flag
-            elif pt==8:
-                out.doubleE8[0] = flag
-            elif pt==9:
-                out.doubleE9[0] = flag
-            elif pt==10:
-                out.doubleE10[0] = flag
-            else:
-                print 'Not expected !!!'
 
-
-#        out.e2_pt[0] = L1_electrons[1][0]
-#        out.e2_eta[0] = L1_electrons[1][1]
-#        out.dr[0] = deltaR(L1_electrons[0][1], L1_electrons[0][2], L1_electrons[1][1], L1_electrons[1][2])
-#    else:
-#        out.e2_pt[0] = -1
-#        out.e2_eta[0] = -1
-#        out.dr[0] = -1
 
 
     out.tree.Fill()

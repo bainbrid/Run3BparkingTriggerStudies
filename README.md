@@ -2,6 +2,14 @@
 
 This code is used to estimate the performance of various trigger configurations aimed at an RK analysis in Run 3.
 
+
+Copy files:
+```
+mkdir root;
+cp /afs/cern.ch/user/y/ytakahas/public/forRob/*.root root/
+```
+
+
 ## Produce ntuples for trigger efficiency and rate estimation
 
 Produce ntuples:
@@ -14,8 +22,8 @@ python rate.py
 Trigger efficiency vs rate:
 ```
 python generateGraphs.py --type ult
-python generateGraphs.py --type rate
-python draw_roc.py
+python generateGraphs.py --type rate --lumi 0.8 [you can also choose whatever value you want]
+python draw_roc.py --lumi 0.8 [you can also choose whatever value you want]
 evince plots/roc_ult.pdf
 ```
 
