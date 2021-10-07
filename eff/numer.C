@@ -94,7 +94,8 @@
   sel += " && (mll_fullfit*mll_fullfit)>1.1 && (mll_fullfit*mll_fullfit)<6.25"; // Low q2 requirement
   //sel += " && abs(tag_eta) < 1.2 && abs(probe_eta) < 1.2"; //@@ EXTRA: RECO eta selection
 
-  nbins = 13; width = 1.; //nbins = 3; width = 4.;
+  nbins = 13; width = 1.;
+  //nbins = 3; width = 4.;
 
   TH2F numer_reco("numer_reco","numer_reco",nbins, 0. ,nbins*width, nbins, 0. ,nbins*width);
   int n1 = t->Draw("tag_pt:probe_pt>>numer_reco",sel.c_str(),"goff");
