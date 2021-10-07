@@ -92,7 +92,7 @@
   sel += " && abs(k_svip3d) < 0.06 && fit_Bcos2D > 0.95";                       // Analysis pre-selection
   sel += " && analysisBdtO > 8.";                                               // Analysis BDT cut
   sel += " && (mll_fullfit*mll_fullfit)>1.1 && (mll_fullfit*mll_fullfit)<6.25"; // Low q2 requirement
-  //sel += " && abs(tag_eta) < 1.2 && abs(probe_eta) < 1.2"; //@@ EXTRA: RECO eta selection
+  sel += " && abs(tag_eta) < 1.2 && abs(probe_eta) < 1.2"; //@@ EXTRA: RECO eta selection
 
   nbins = 13; width = 1.;
   //nbins = 3; width = 4.;

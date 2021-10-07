@@ -14,7 +14,7 @@
   std::string sel;
   //sel += "gen_e1_pt > 0.5 && gen_e2_pt > 0.5";                 //@@ EXTRA: GEN pT selection
   //sel += " && abs(gen_e1_eta) < 2.5 && abs(gen_e2_eta) < 2.5"; //@@ EXTRA: GEN eta selection
-  //sel += "abs(gen_e1_eta) < 1.2 && abs(gen_e2_eta) < 1.2"; //@@ EXTRA: GEN eta selection
+  sel += "abs(gen_e1_eta) < 1.2 && abs(gen_e2_eta) < 1.2"; //@@ EXTRA: GEN eta selection
   int n2 = tree->Draw("gen_e1_pt:gen_e2_pt>>denom_sel",sel.c_str(),"goff");
   std::cout << "processed denom sel:" << n2 << std::endl;
 
