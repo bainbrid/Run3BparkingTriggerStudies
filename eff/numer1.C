@@ -1,4 +1,65 @@
-{
+#include "TChain.h"
+#include "TFile.h"
+#include "TH2F.h"
+#include "TString.h"
+#include <iostream>
+#include <string>
+
+TH2F* histo_pt1_vs_pt2(TChain* tree, std::string name, std::string selection,
+		       int xbins, float xmin, float xmax,
+		       int ybins, float ymin, float ymax) {
+  std::string sel_lead = "tag_ptMc>=probe_ptMc"; if ( !selection.empty() ) sel_lead += " && "+selection;
+  TH2F histo_lead(std::string(name+"_lead").c_str(),
+		  std::string(name+"_lead").c_str(),
+		  xbins, xmin, xmax,
+		  ybins, ymin, ymax);
+  int n1 = tree->Draw(std::string("tag_ptMc:probe_ptMc>>"+name+"_lead").c_str(),sel_lead.c_str(),"goff");
+  //std::cout << "processed " << histo_lead.GetName() << ": " << n1 << std::endl;
+  std::string sel_sub = "tag_ptMc<probe_ptMc"; if ( !selection.empty() ) sel_sub += " && "+selection;
+  TH2F histo_sub(std::string(name+"_sub").c_str(),
+		 std::string(name+"_sub").c_str(),
+		 xbins, xmin, xmax,
+		 ybins, ymin, ymax);
+  int n2 = tree->Draw(std::string("probe_ptMc:tag_ptMc>>"+name+"_sub").c_str(),sel_sub.c_str(),"goff");
+  //std::cout << "processed " << histo_sub.GetName() << ": " << n2 << std::endl;
+  TH2F* histo = (TH2F*)histo_lead.Clone(name.c_str());
+  histo->Add(&histo_sub,1.);
+  std::cout << "processed " << histo->GetName() << ": " << histo->GetEntries() << std::endl;
+  return histo;
+};
+
+TH2F* histo_var_vs_pt2(TChain* tree, std::string name, std::string var, std::string selection, 
+		       int xbins, float xmin, float xmax,
+		       int ybins, float ymin, float ymax) {
+  std::string sel_tag = "tag_pt<probe_ptMc"; if ( !selection.empty() ) sel_tag += " && "+selection;
+  TH2F histo_tag(std::string(name+"_tag").c_str(),
+		 std::string(name+"_tag").c_str(),
+		 xbins, xmin, xmax,
+		 ybins, ymin, ymax);
+  int n1 = tree->Draw(std::string(var+":tag_ptMc>>"+name+"_tag").c_str(),sel_tag.c_str(),"goff");
+  std::cout << "processed " << histo_tag.GetName() << ": " << n1 << std::endl;
+  std::string sel_probe = "tag_ptMc>=probe_ptMc"; if ( !selection.empty() ) sel_probe += " && "+selection;
+  TH2F histo_probe(std::string(name+"_probe").c_str(),
+		   std::string(name+"_probe").c_str(),
+		   xbins, xmin, xmax,
+		   ybins, ymin, ymax);
+  int n2 = tree->Draw(std::string(var+":probe_ptMc>>"+name+"_probe").c_str(),sel_probe.c_str(),"goff");
+  std::cout << "processed " << histo_probe.GetName() << ": " << n2 << std::endl;
+  TH2F* histo = (TH2F*)histo_tag.Clone(name.c_str());
+  histo->Add(&histo_probe,1.);
+  std::cout << "processed " << histo->GetName() << ": " << histo->GetEntries() << std::endl;
+  return histo;
+};
+
+TH1F histo_var(TChain* tree, std::string name, std::string var, std::string selection, 
+	       int xbins, float xmin, float xmax) {
+  TH1F histo(name.c_str(),name.c_str(),xbins, xmin, xmax);
+  int n1 = tree->Draw(std::string(var+">>"+name).c_str(),selection.c_str(),"goff");
+  std::cout << "processed " << histo.GetName() << ": " << histo.GetEntries() << std::endl;
+  return histo;
+};
+
+void numer1() {
 
   //  TFile f("root/francesca.root");
   //  TTree* t = (TTree*)f.Get("TaPtree");
@@ -88,16 +149,10 @@
   std::cout << "entries: " << t->GetEntries() << std::endl; // entries: TTree = 17050, TChain = 3137854
   
   // Binning for gen pT for e1 and e2
-  nbins = 13; width = 1.;
-  //nbins = 3; width = 4.;
-  
-//  std::string bdt;
-//  std::string sel;
-//  sel += "bmatchMC==1";                                                         // GEN-match to signal
-//  sel += " && abs(k_svip3d) < 0.06 && fit_Bcos2D > 0.95";                       // Analysis pre-selection
-//  bdt  = " && analysisBdtO > 8."; sel += bdt;                                   // Analysis BDT cut
-//  sel += " && (mll_fullfit*mll_fullfit)>1.1 && (mll_fullfit*mll_fullfit)<6.25"; // Low q2 requirement
-//  sel += " && abs(tag_eta) < 1.2 && abs(probe_eta) < 1.2"; //@@ EXTRA: RECO eta selection
+  int nbins = 13; float width = 1.; //nbins = 3; width = 4.;
+  int xbins = nbins;
+  float xmin = 0.;
+  float xmax = nbins*width;
   
   // GEN-match to signal
   std::string sel_sig = "bmatchMC==1";
@@ -128,107 +183,45 @@
 	    << "  sel_bdt:    " << sel_bdt << std::endl
 	    << "  everything: " << sel_all << std::endl;
 
-  // Misc histos (probably not useful...)
-  TH2F numer_reco("numer_reco","numer_reco",nbins, 0. ,nbins*width, nbins, 0. ,nbins*width);
-  int n1 = t->Draw("tag_pt:probe_pt>>numer_reco",sel_all.c_str(),"goff");
-  std::cout << "processed numer reco: " << n1 << std::endl;
+  // Histos 2D (GEN e1 pT vs GEN e2 pT) after various selections
+  TH2F* numer_pt1_vs_pt2_after_lq2 = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_after_lq2",sel_lq2,xbins,xmin,xmax,xbins,xmin,xmax);
+  TH2F* numer_pt1_vs_pt2_after_eta = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_after_eta",sel_eta,xbins,xmin,xmax,xbins,xmin,xmax);
+  TH2F* numer_pt1_vs_pt2_after_ana = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_after_ana",sel_ana,xbins,xmin,xmax,xbins,xmin,xmax);
+  TH2F* numer_pt1_vs_pt2_after_bdt = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_after_bdt",sel_bdt,xbins,xmin,xmax,xbins,xmin,xmax);
 
-  TH2F numer_gen_all("numer_gen_all","numer_gen_all",nbins, 0. ,nbins*width, nbins, 0. ,nbins*width);
-  int n2 = t->Draw("tag_ptMc:probe_ptMc>>numer_gen_all",sel_all.c_str(),"goff");
-  std::cout << "processed numer_gen_all: " << n2 << std::endl;
+  // Histos 2D ("N-1" BDT vs GEN e2 pT) after various selections
+  TH2F* numer_bdt_vs_pt2_after_inc = histo_var_vs_pt2(t,"numer_bdt_vs_pt2_after_inc","analysisBdtO",sel_sig,xbins,xmin,xmax,21,-5.,16.);
+  TH2F* numer_bdt_vs_pt2_after_lq2 = histo_var_vs_pt2(t,"numer_bdt_vs_pt2_after_lq2","analysisBdtO",sel_lq2,xbins,xmin,xmax,21,-5.,16.);
+  TH2F* numer_bdt_vs_pt2_after_eta = histo_var_vs_pt2(t,"numer_bdt_vs_pt2_after_eta","analysisBdtO",sel_eta,xbins,xmin,xmax,21,-5.,16.);
+  TH2F* numer_bdt_vs_pt2_after_ana = histo_var_vs_pt2(t,"numer_bdt_vs_pt2_after_ana","analysisBdtO",sel_ana,xbins,xmin,xmax,21,-5.,16.);
 
-  // Histos GEN pT (e1,e2) after sel_lq2 for lead, sub, and sum
-  std::string sel1_lq2 = "tag_ptMc>=probe_ptMc && " + sel_lq2;
-  TH2F numer_lq2_gen_lead("numer_lq2_gen_lead","numer_lq2_gen_lead",nbins, 0. ,nbins*width, nbins, 0. ,nbins*width);
-  int n3_lq2 = t->Draw("tag_ptMc:probe_ptMc>>numer_lq2_gen_lead",sel1_lq2.c_str(),"goff");
-  std::cout << "processed numer_lq2_gen_lead: " << n3_lq2 << std::endl;
-  std::string sel2_lq2 = "tag_ptMc<probe_ptMc && " + sel_lq2;
-  TH2F numer_lq2_gen_sub("numer_lq2_gen_sub","numer_lq2_gen_sub",nbins, 0. ,nbins*width, nbins, 0. ,nbins*width);
-  int n4_lq2 = t->Draw("probe_ptMc:tag_ptMc>>numer_lq2_gen_sub",sel2_lq2.c_str(),"goff");
-  std::cout << "processed numer_lq2_gen_sub: " << n4_lq2 << std::endl;
-  TH2F* numer_lq2_gen_sum = (TH2F*)numer_lq2_gen_lead.Clone("numer_lq2_gen_sum");
-  numer_lq2_gen_sum->Add(&numer_lq2_gen_sub,1.);
+  // Histos 1D ("N-1" BDT) after various selections
+  TH1F numer_bdt_after_inc = histo_var(t,"numer_bdt_after_inc","analysisBdtO",sel_sig,21,-5.,16.);
+  TH1F numer_bdt_after_lq2 = histo_var(t,"numer_bdt_after_lq2","analysisBdtO",sel_lq2,21,-5.,16.);
+  TH1F numer_bdt_after_eta = histo_var(t,"numer_bdt_after_eta","analysisBdtO",sel_eta,21,-5.,16.);
+  TH1F numer_bdt_after_ana = histo_var(t,"numer_bdt_after_ana","analysisBdtO",sel_ana,21,-5.,16.);
+  TH1F numer_bdt_after_pt2 = histo_var(t,"numer_bdt_after_pt2","analysisBdtO",sel_ana+" && probe_ptMc>10.",21,-5.,16.);
 
-  std::cout << "entries numer_lq2_gen_lead: " << numer_lq2_gen_lead.GetEntries() << std::endl;
-  std::cout << "entries numer_lq2_gen_sub: " << numer_lq2_gen_sub.GetEntries() << std::endl;
-  std::cout << "entries numer_lq2_gen_sum: " << numer_lq2_gen_sum->GetEntries() << std::endl;
-
-  // Histos GEN pT (e1,e2) after sel_eta for lead, sub, and sum
-  std::string sel1_eta = "tag_ptMc>=probe_ptMc && " + sel_eta;
-  TH2F numer_eta_gen_lead("numer_eta_gen_lead","numer_eta_gen_lead",nbins, 0. ,nbins*width, nbins, 0. ,nbins*width);
-  int n3_eta = t->Draw("tag_ptMc:probe_ptMc>>numer_eta_gen_lead",sel1_eta.c_str(),"goff");
-  std::cout << "processed numer_eta_gen_lead: " << n3_eta << std::endl;
-  std::string sel2_eta = "tag_ptMc<probe_ptMc && " + sel_eta;
-  TH2F numer_eta_gen_sub("numer_eta_gen_sub","numer_eta_gen_sub",nbins, 0. ,nbins*width, nbins, 0. ,nbins*width);
-  int n4_eta = t->Draw("probe_ptMc:tag_ptMc>>numer_eta_gen_sub",sel2_eta.c_str(),"goff");
-  std::cout << "processed numer_eta_gen_sub: " << n4_eta << std::endl;
-  TH2F* numer_eta_gen_sum = (TH2F*)numer_eta_gen_lead.Clone("numer_eta_gen_sum");
-  numer_eta_gen_sum->Add(&numer_eta_gen_sub,1.);
-
-  // Histos GEN pT (e1,e2) after sel_ana for lead, sub, and sum
-  std::string sel1_ana = "tag_ptMc>=probe_ptMc && " + sel_ana;
-  TH2F numer_ana_gen_lead("numer_ana_gen_lead","numer_ana_gen_lead",nbins, 0. ,nbins*width, nbins, 0. ,nbins*width);
-  int n3_ana = t->Draw("tag_ptMc:probe_ptMc>>numer_ana_gen_lead",sel1_ana.c_str(),"goff");
-  std::cout << "processed numer_ana_gen_lead: " << n3_ana << std::endl;
-  std::string sel2_ana = "tag_ptMc<probe_ptMc && " + sel_ana;
-  TH2F numer_ana_gen_sub("numer_ana_gen_sub","numer_ana_gen_sub",nbins, 0. ,nbins*width, nbins, 0. ,nbins*width);
-  int n4_ana = t->Draw("probe_ptMc:tag_ptMc>>numer_ana_gen_sub",sel2_ana.c_str(),"goff");
-  std::cout << "processed numer_ana_gen_sub: " << n4_ana << std::endl;
-  TH2F* numer_ana_gen_sum = (TH2F*)numer_ana_gen_lead.Clone("numer_ana_gen_sum");
-  numer_ana_gen_sum->Add(&numer_ana_gen_sub,1.);
-
-  // Histos GEN pT (e1,e2) after sel_bdt selection for lead, sub, and sum
-  std::string sel1_bdt = "tag_ptMc>=probe_ptMc && " + sel_bdt;
-  TH2F numer_bdt_gen_lead("numer_bdt_gen_lead","numer_bdt_gen_lead",nbins, 0. ,nbins*width, nbins, 0. ,nbins*width);
-  int n3_bdt = t->Draw("tag_ptMc:probe_ptMc>>numer_bdt_gen_lead",sel1_bdt.c_str(),"goff");
-  std::cout << "processed numer_bdt_gen_lead: " << n3_bdt << std::endl;
-  std::string sel2_bdt = "tag_ptMc<probe_ptMc && " + sel_bdt;
-  TH2F numer_bdt_gen_sub("numer_bdt_gen_sub","numer_bdt_gen_sub",nbins, 0. ,nbins*width, nbins, 0. ,nbins*width);
-  int n4_bdt = t->Draw("probe_ptMc:tag_ptMc>>numer_bdt_gen_sub",sel2_bdt.c_str(),"goff");
-  std::cout << "processed numer_bdt_gen_sub: " << n4_bdt << std::endl;
-  TH2F* numer_bdt_gen_sum = (TH2F*)numer_bdt_gen_lead.Clone("numer_bdt_gen_sum");
-  numer_bdt_gen_sum->Add(&numer_bdt_gen_sub,1.);
-
-  // Histo (BDT score, GEN pT sublead) after sel_ana selection for each sulead (tag or probe) and sum
-  std::string sel3 = "tag_pt<probe_ptMc && " + sel_ana; // tag is sub, probe is lead
-  TH2F numer_bdt_sub_tag("numer_bdt_sub_tag","numer_bdt_sub_tag",nbins, 0. ,nbins*width, 20, -20., 20.);
-  int n5 = t->Draw("tag_ptMc:analysisBdtO>>numer_bdt_sub_tag",sel3.c_str(),"goff");
-  std::cout << "processed numer_bdt_sub_tag: " << n5 << std::endl;
-  std::string sel4 = "tag_ptMc>=probe_ptMc && " + sel_ana; // probe is sub, tag is lead
-  TH2F numer_bdt_sub_probe("numer_bdt_sub_probe","numer_bdt_sub_probe",nbins, 0. ,nbins*width, 20, -20., 20.);
-  int n6 = t->Draw("probe_ptMc:analysisBdtO>>numer_bdt_sub_probe",sel4.c_str(),"goff");
-  std::cout << "processed numer_bdt_sub_probe: " << n6 << std::endl;
-  TH2F* numer_bdt_sub_sum = (TH2F*)numer_bdt_sub_tag.Clone("numer_bdt_sub_sum");
-  numer_bdt_sub_sum->Add(&numer_bdt_sub_probe,1.);
-
-  TH1F bdt_inc("bdt_inc","bdt_inc",20, -20., 20.);
-  t->Draw("analysisBdtO>>bdt_inc","","goff");
-  TH1F bdt_lq2("bdt_lq2","bdt_lq2",20, -20., 20.);
-  t->Draw("analysisBdtO>>bdt_lq2",sel_lq2.c_str(),"goff");
-  TH1F bdt_ana("bdt_ana","bdt_ana",20, -20., 20.);
-  t->Draw("analysisBdtO>>bdt_ana",sel_ana.c_str(),"goff");
+  ////////////////////////////////////////////////////////////////////////////////
 
   // Write to file
   TFile fw("latest/numer.root","RECREATE");
   //
-  numer_reco.Write();
-  numer_gen_all.Write();
+  numer_pt1_vs_pt2_after_lq2->Write();
+  numer_pt1_vs_pt2_after_eta->Write();
+  numer_pt1_vs_pt2_after_ana->Write();
+  numer_pt1_vs_pt2_after_bdt->Write();
   //
-  numer_bdt_gen_lead.Write();
-  numer_bdt_gen_sub.Write();
+  numer_bdt_vs_pt2_after_inc->Write();
+  numer_bdt_vs_pt2_after_lq2->Write();
+  numer_bdt_vs_pt2_after_eta->Write();
+  numer_bdt_vs_pt2_after_ana->Write();
   //
-  numer_lq2_gen_sum->Write();
-  numer_eta_gen_sum->Write();
-  numer_ana_gen_sum->Write();
-  numer_bdt_gen_sum->Write();
-  //
-  numer_bdt_sub_tag.Write();
-  numer_bdt_sub_probe.Write();
-  numer_bdt_sub_sum->Write();
-  //
-  bdt_inc.Write();
-  bdt_lq2.Write();
-  bdt_ana.Write();
+  numer_bdt_after_inc.Write();
+  numer_bdt_after_lq2.Write();
+  numer_bdt_after_eta.Write();
+  numer_bdt_after_ana.Write();
+  numer_bdt_after_pt2.Write();
   //
   fw.Close();
   std::cout << "done!" << std::endl;
