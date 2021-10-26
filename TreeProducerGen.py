@@ -78,6 +78,8 @@ class TreeProducerGen(TreeProducerCommon):
         self.addBranch('ngenmuons',                  'i')
         self.addBranch('ngenelectrons',                  'i')
 
+        self.addBranch('trigger',                  'i')
+
 
         def finalDaughters(particle, daughters):
             '''Fills daughters with all the daughters of particle.
