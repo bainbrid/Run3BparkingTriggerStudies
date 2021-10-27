@@ -4,7 +4,29 @@ from common.deltar import deltaR
 from TreeProducerGen import *
 
 #files=['file:./root/MINIAOD.root']
-files=['root://cms-xrd-global.cern.ch//store/mc/RunIIAutumn18MiniAOD/BuToKee_MufilterPt6_SoftQCDnonD_TuneCP5_13TeV-pythia8-evtgen/MINIAODSIM/PUPoissonAve20_BParking_102X_upgrade2018_realistic_v15-v1/00000/01501E26-9276-7149-A74D-5E4B2E028DC8.root']
+path="root://cms-xrd-global.cern.ch//store/mc/RunIIAutumn18MiniAOD/BuToKee_MufilterPt6_SoftQCDnonD_TuneCP5_13TeV-pythia8-evtgen/MINIAODSIM/PUPoissonAve20_BParking_102X_upgrade2018_realistic_v15-v1/"
+files=[
+    path+'00000/01501E26-9276-7149-A74D-5E4B2E028DC8.root',
+    path+"260000/00FD1710-09A4-9A45-B22B-6395B15DA05E.root",
+    path+"260000/D368E158-9B9A-F645-A48E-772F29E729D8.root",
+    path+"260000/B2A8EC54-1587-AD49-9C4F-C82C0648FADF.root",
+    path+"260000/DEB8EE96-CB34-8C40-8C78-BF3F4DA3828E.root",
+    path+"260000/0766236A-6FF9-5044-8FEB-2509F498CEF2.root",
+    path+"260000/38630A2B-EC5A-2146-AB1C-C1C016A83537.root",
+    path+"260000/72E77B37-BF53-D546-9A82-780AC8062350.root",
+    path+"260000/86791084-34DA-BB4E-92E3-39FB45FDBA97.root",
+    path+"260000/5E4DAFD3-D90F-5C4C-B6FC-2ED49E997014.root",
+    path+"260000/F326012E-A5EA-E549-8A03-BA0867C1BD7F.root",
+    path+"260000/4FBA2D0E-481B-854A-91DD-FD75DE6C4802.root",
+    path+"260000/247806D2-A976-6B40-BB72-6D3A23B47DFC.root",
+    path+"130000/2FF74584-E028-B042-8B14-0C1D4C46389B.root",
+    path+"280000/C66696E9-DC61-6146-AEED-69B4BE9A10FE.root",
+    path+"280000/25CEE19C-3881-7C4D-9BA2-6C5286DFE3F4.root",
+    path+"280000/129D7AB9-CC04-014B-AB77-074A395337F3.root",
+    path+"280000/1253B701-1703-EB4F-9DCF-DB31A2DF4BD2.root",
+    path+"280000/1855AB46-1FB8-BD49-997D-3D5879C58106.root",
+    path+"280000/522A856A-77BA-8941-9102-236E6B02E52F.root",
+    ]
 
 events = Events(files)
 nevent = int(events.size())
