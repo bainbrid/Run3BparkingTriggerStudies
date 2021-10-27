@@ -28,9 +28,11 @@ files=[
     path+"280000/522A856A-77BA-8941-9102-236E6B02E52F.root",
     ]
 
+print 'Processing {:.0f} files...'.format(len(files))
+
 events = Events(files)
 nevent = int(events.size())
-print 'Number of files analyzed: ',len(files),' Total number of events: ',nevent
+print 'Number of files processed: {:.0f}, total number of events processed: {:.0f}'.format(len(files),nevent)
 
 handle = Handle('std::vector<reco::GenParticle>')
 label = ("prunedGenParticles")
@@ -49,11 +51,13 @@ hlt_paths=["HLT_Mu7_IP4","HLT_Mu8_IP6","HLT_Mu8_IP5","HLT_Mu8_IP3","HLT_Mu8p5_IP
 trigger_indices=None
 trigger_debug=0
 
+print "Starting event loop..."
+
 nanalyzed = 0
 ndropped = 0
 for ievent,ev in enumerate(events):
     #if ievent > 10 : continue
-    if ievent%1000==0: print('{0:.2f}% processed'.format(Double(ievent)/Double(nevent)*100.))
+    if ievent%1000==0: print('{0:.f}% processed'.format(Double(ievent)/Double(nevent)*100.))
     #print('{0:.0f} processed'.format(Double(ievent)))
 
     # Get trigger collections
@@ -62,7 +66,7 @@ for ievent,ev in enumerate(events):
     ev.getByLabel(triggerPrescaleLabel, triggerPrescales)
 
     # Identify trigger indices (Assumes they don't change? So let's check every N events!)
-    if ievent%1000==0 or trigger_indices==None:
+    if ievent%100000==0 or trigger_indices==None:
         print "determine trigger indices..."
         trigger_indices = []
         names = ev.object().triggerNames(triggerBits.product())
@@ -177,5 +181,5 @@ for ievent,ev in enumerate(events):
     out.tree.Fill()
     nanalyzed += 1
 
-print 'Number of events analyzed: ',nanalyzed,' Number of events dropped: ',ndropped
+print 'Number of events analyzed: {:.0f}, number of events dropped: {:.0f}'.format(nanalyzed,ndropped)
 out.endJob()
