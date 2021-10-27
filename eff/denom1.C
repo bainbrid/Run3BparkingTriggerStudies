@@ -1,4 +1,5 @@
 #include "common.C"
+#include "TChain.h"
 #include "TCut.h"
 #include "TFile.h"
 #include "TH2F.h"
