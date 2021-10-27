@@ -14,7 +14,7 @@ float xmax = nbins*width;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return TChain
-TChain* input(std::string name) {
+TChain* input(std::string name, int nfiles=1e6) {
 
   std::string path="/eos/cms/store/group/phys_bphys/cavalari/skimbig/BuToKee_v2_noreg_";
   std::vector<std::string> files;
@@ -101,7 +101,7 @@ TChain* input(std::string name) {
   if (name=="numer") {
     //  TFile f("root/francesca.root");
     //  TTree* t = (TTree*)f.Get("TaPtree");
-    int nfiles = std::min(int(files.size()),int(5));
+    nfiles = std::min(int(files.size()),nfiles);
     TChain* tree = new TChain("TaPtree");
     for ( int ifile=0; ifile<nfiles; ++ifile) { tree->Add(files[ifile].c_str()); }
     return tree;
