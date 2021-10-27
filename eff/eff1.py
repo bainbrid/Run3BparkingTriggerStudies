@@ -1,116 +1,86 @@
-from ROOT import TFile, TH2F, TCanvas, gStyle, gROOT, kTRUE
-import copy, math
-gROOT.SetBatch(kTRUE)
+from ROOT import TFile
+from common import *
+#import copy, math
 
-def addOverflows(his):
-    if his.GetSumw2N() == 0 : his.Sumw2(kTRUE)
-    xbins = his.GetXaxis().GetNbins()
-    ybins = his.GetYaxis().GetNbins()
-    entries = his.GetEntries()
-    for xbin in range(1,xbins+1):
-        content = his.GetBinContent(xbin,ybins)
-        outlier = his.GetBinContent(xbin,ybins+1)
-        his.SetBinContent(xbin,ybins,content+outlier)
-        his.SetBinContent(xbin,ybins+1,0.)
-    content = his.GetBinContent(xbin,ybins)
-    outlier = his.GetBinContent(xbins+1,ybins+1)
-    his.SetBinContent(xbins,ybins,content+outlier)
-    his.SetBinContent(xbins+1,ybins+1,0.)
-    his.SetEntries(entries)
-    return his
-
-def createPdf(his,canvas,eff=True,logy=True,zmax=None):
-    canvas.cd()
-    his.Draw("TEXT COLZ")
-    his.SetStats(0)
-    if eff: 
-        gStyle.SetPaintTextFormat("4.2f");
-        his.SetMinimum(1.e-6)
-        #his.SetMaximum(1.)
-        his.SetMarkerSize(1.6)
-    else: 
-        gStyle.SetPaintTextFormat(".0f");
-        his.SetMinimum(0.1)
-        if zmax is not None : his.SetMaximum(zmax)
-        his.SetMarkerSize(1.)
-    if logy : canvas.SetLogz()
-    return canvas
-
-def getHisto(output_file,input_file,histo_name,scale,eff,zmax):
-    print("here1")
-    _file = TFile(input_file)
-    _histo = _file.Get(histo_name)
-    _histo = addOverflows(_histo)
-    _histo.SetTitle(histo_name)
-    _histo2 = _histo.Clone(histo_name+"_unweighted")
-    _histo2.SetTitle(histo_name+"_unweighted")
-    _histo.Scale(scale)
-    _canvas = TCanvas()
-    _canvas = createPdf(_histo,_canvas,eff=eff,zmax=zmax)
-    _canvas.SaveAs("latest/{:s}.pdf".format(histo_name)) 
-    output_file.cd()
-    _histo.Write()
-    print("here2")
-    return _histo
-
-##########################
-
-output_file = TFile('latest/eff.root','RECREATE')
-
-files_available = 79.
-files_processed = 5.#77.
-inputs = [
-    ("latest/numer.root","numer_bdt_gen_sum",files_available/files_processed,False,1.e5),
-]
+################################################################################
+# Outputs
 outputs = {}
-for input_file,histo_name,scale,eff,zmax in inputs:
-    #outputs[histo_name] = 
-    getHisto(output_file,input_file,histo_name,scale,eff,zmax)
+output = TFile('latest/eff.root','RECREATE')
 
-print(inputs)
+################################################################################
+# Denominator histogram, open, no selection
+title="denom_pt1_vs_pt2_after_inc_unweighted"
+outputs[title] = writeHisto(output,"latest/denom.root","denom_pt1_vs_pt2_after_inc",title,zmax=5.e3)
+
+################################################################################
+# Scaling
+entries=outputs[title].GetEntries()
+DAS_entries = 31585558.
+denom_scale = DAS_entries / entries
+files_processed = 5.#77.
+files_available = 79.
+numer_scale = files_available / files_processed
+
+################################################################################
+# All numer and denom histograms for pt1_vs_pt2
+inputs_pt = [
+    # unweighted (denom_nosel_unweighted is above ^^^)
+    ("latest/denom.root","denom_pt1_vs_pt2_after_inc","denom_pt1_vs_pt2_after_inc_unweighted",None,True,1.e5),
+    ("latest/denom.root","denom_pt1_vs_pt2_after_cen","denom_pt1_vs_pt2_after_cen_unweighted",None,True,1.e5),
+    ("latest/numer.root","numer_pt1_vs_pt2_after_lq2","numer_pt1_vs_pt2_after_lq2_unweighted",None,True,5.e3),
+    ("latest/numer.root","numer_pt1_vs_pt2_after_eta","numer_pt1_vs_pt2_after_eta_unweighted",None,True,5.e3),
+    ("latest/numer.root","numer_pt1_vs_pt2_after_ana","numer_pt1_vs_pt2_after_ana_unweighted",None,True,5.e3),
+    ("latest/numer.root","numer_pt1_vs_pt2_after_bdt","numer_pt1_vs_pt2_after_bdt_unweighted",None,True,5.e3),
+    # weighted
+    ("latest/denom.root","denom_pt1_vs_pt2_after_inc","denom_pt1_vs_pt2_after_inc_weighted",denom_scale,True,5.e6),
+    ("latest/denom.root","denom_pt1_vs_pt2_after_cen","denom_pt1_vs_pt2_after_cen_weighted",denom_scale,True,5.e6),
+    ("latest/numer.root","numer_pt1_vs_pt2_after_lq2","numer_pt1_vs_pt2_after_lq2_weighted",numer_scale,True,5.e3),
+    ("latest/numer.root","numer_pt1_vs_pt2_after_eta","numer_pt1_vs_pt2_after_eta_weighted",numer_scale,True,5.e3),
+    ("latest/numer.root","numer_pt1_vs_pt2_after_ana","numer_pt1_vs_pt2_after_ana_weighted",numer_scale,True,5.e3),
+    ("latest/numer.root","numer_pt1_vs_pt2_after_bdt","numer_pt1_vs_pt2_after_bdt_weighted",numer_scale,True,5.e3),
+]
+for input,name,title,scale,logy,zmax in inputs_pt:
+    outputs[title] = writeHisto(output,input,name,title,scale,logy,zmax)
+
+################################################################################
+# All numer and denom histograms for bdt_vs_pt2
+inputs_bdt = [
+    # bdt_vs_pt2, unweighted
+    ("latest/numer.root","numer_bdt_vs_pt2_after_ana","numer_bdt_vs_pt2_after_ana_unweighted",None,True,5.e3,None,"gt"),
+    ("latest/numer.root","numer_bdt_vs_pt2_after_ana","numer_bdt_vs_pt2_after_ana_weighted",numer_scale,True,5.e3,None,"gt"),
+]
+for input,name,title,scale,logy,zmax,xcumu,ycumu in inputs_bdt:
+    outputs[title] = writeHisto(output,input,name,title,scale,logy,zmax,xcumu,ycumu)
+
+################################################################################
+# denom histo for bdt
+title="denom_pt1_vs_pt2_after_cen_weighted_transformed"
+outputs[title] = transformDenom(output,
+                                numer=outputs["numer_bdt_vs_pt2_after_ana_weighted"],
+                                denom=outputs["denom_pt1_vs_pt2_after_cen_weighted"],
+                                title=title)
+
+################################################################################
+# All efficiency histograms
+inputs_eff = [
+    # pt_vs_pt
+    ("numer_pt1_vs_pt2_after_lq2_weighted","denom_pt1_vs_pt2_after_cen_weighted","eff_pt1_vs_pt2_cumu_lq2_weighted",1.),
+    ("numer_pt1_vs_pt2_after_eta_weighted","denom_pt1_vs_pt2_after_cen_weighted","eff_pt1_vs_pt2_cumu_eta_weighted",1.),
+    ("numer_pt1_vs_pt2_after_ana_weighted","denom_pt1_vs_pt2_after_cen_weighted","eff_pt1_vs_pt2_cumu_ana_weighted",1.),
+    ("numer_pt1_vs_pt2_after_bdt_weighted","denom_pt1_vs_pt2_after_cen_weighted","eff_pt1_vs_pt2_cumu_bdt_weighted",1.),
+    # bdt_vs_pt
+    ("numer_bdt_vs_pt2_after_ana_weighted","denom_pt1_vs_pt2_after_cen_weighted_transformed","eff_bdt_vs_pt2_after_ana_weighted",1.),
+]
+for numer,denom,title,zmax in inputs_eff:
+    outputs[title] = writeEff(output,outputs[numer],outputs[denom],title,zmax)
+
+################################################################################
+# Outputs 
+print(inputs_pt)
+print(inputs_bdt)
+print(inputs_eff)
 print(outputs)
-
-output_file.Close()
-
-##########################
-
-## numer
-#print "numer"
-#numer_file = TFile('latest/numer.root')
-##numer_histo_lead = numer_file.Get('numer_gen_lead')
-##numer_histo_sub = numer_file.Get('numer_gen_sub')
-##numer_histo = numer_histo_lead.Clone("numer")
-##numer_histo.Add(numer_histo_sub)
-#numer_histo = numer_file.Get('numer_bdt_gen_sum')
-#numer_histo = addOverflows(numer_histo)
-#numer_histo.SetTitle("numer")
-#numer_histo2 = numer_histo.Clone("numer_unweighted")
-#numer_histo2.SetTitle("numer_unweighted")
-## scale
-#files_available = 79.
-#files_processed = 5.#77.
-#numer_histo.Scale(files_available/files_processed)
-##numer_histo_sum.Scale(files_available/files_processed)
-#
-## denom
-#print "denom"
-#denom_file = TFile('latest/denom.root')
-#denom_histo = denom_file.Get('denom_sel')
-#denom_histo = addOverflows(denom_histo)
-#denom_histo.SetTitle("denom")
-#denom_histo2 = denom_histo.Clone("denom_unweighted")
-#denom_histo2.SetTitle("denom_unweighted")
-## Scale
-#DAS_entries = 31585558.
-#entries = denom_file.Get('denom_nosel').GetEntries()
-#denom_histo.Scale(DAS_entries/entries)
-#
-## eff
-#print "eff"
-#eff_histo = numer_histo.Clone("eff")
-#eff_histo.Divide(numer_histo,denom_histo)
-#eff_histo.SetTitle("Analysis efficiency")
-##print "minimum  eff: ", eff_histo.GetMinimum(1.e-9)
+output.Close()
 
 ## debug
 #xbin = 2
@@ -131,50 +101,3 @@ output_file.Close()
 #unwei = numer_histo2.GetBinContent(xbin,ybin)
 #print "wei",numer,"unw",unwei,"ratio",numer/unwei
 #print "eff",numer/denom
-
-# output
-#eff_file = TFile('latest/eff.root','RECREATE')
-
-
-
-##numer_histo_lead.Write()
-##numer_histo_sub.Write()
-#numer_histo.Write()
-#denom_histo.Write()
-#eff_histo.Write()
-#
-#numer_canvas = TCanvas()
-#numer_canvas = createPdf(numer_histo,numer_canvas,eff=False,zmax=1.e5)
-#numer_canvas.SaveAs("latest/numer.pdf")
-#
-#numer_canvas2 = TCanvas()
-#numer_canvas2 = createPdf(numer_histo2,numer_canvas2,eff=False,zmax=2.e3)
-#numer_canvas2.SaveAs("latest/numer_unweighted.pdf")
-#
-##numer_canvas_lead = TCanvas()
-##numer_canvas_lead = createPdf(numer_histo_lead,numer_canvas_lead,eff=False)
-##numer_canvas_lead.SaveAs("latest/numer_lead.pdf")
-#
-##numer_canvas_sub = TCanvas()
-##numer_canvas_sub = createPdf(numer_histo_sub,numer_canvas_sub,eff=False)
-##numer_canvas_sub.SaveAs("latest/numer_sub.pdf")
-#
-##numer_canvas_sum = TCanvas()
-##numer_canvas_sum = createPdf(numer_histo_sum,numer_canvas_sum,eff=False)
-##numer_canvas_sum.SaveAs("latest/numer_sum.pdf")
-#
-#denom_canvas = TCanvas()
-#denom_canvas = createPdf(denom_histo,denom_canvas,eff=False,zmax=5.e6)
-#denom_canvas.SaveAs("latest/denom.pdf")
-#
-#denom_canvas2 = TCanvas()
-#denom_canvas2 = createPdf(denom_histo2,denom_canvas2,eff=False,zmax=2.e3)
-#denom_canvas2.SaveAs("latest/denom_unweighted.pdf")
-#
-#eff_canvas = TCanvas()
-#eff_canvas = createPdf(eff_histo,eff_canvas,logy=False)
-#eff_canvas.SaveAs("latest/eff.pdf")
-#eff_canvas = createPdf(eff_histo,eff_canvas,logy=True)
-#eff_canvas.SaveAs("latest/eff_log.pdf")
-#
-#eff_file.Close()
