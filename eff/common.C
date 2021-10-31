@@ -101,9 +101,14 @@ TChain* input(std::string name, int nfiles=1e6) {
   if (name=="numer") {
     //  TFile f("root/francesca.root");
     //  TTree* t = (TTree*)f.Get("TaPtree");
+    int cntr = 0;
     nfiles = std::min(int(files.size()),nfiles);
     TChain* tree = new TChain("TaPtree");
-    for ( int ifile=0; ifile<nfiles; ++ifile) { tree->Add(files[ifile].c_str()); }
+    for ( int ifile=0; ifile<nfiles; ++ifile) { 
+      tree->Add(files[ifile].c_str()); 
+      ++cntr; 
+      std::cout << "processed " << cntr << " files..." << std::endl;
+    }
     return tree;
   } else if (name=="denom") {
     //TFile f("root/genstudy_pt.root");
@@ -143,6 +148,7 @@ TH2F* histo_pt1_vs_pt2(TChain* tree, std::string name,
   //std::cout << "processed " << histo_sub.GetName() << ": " << n2 << std::endl;
   TH2F* histo = (TH2F*)histo_lead.Clone(name.c_str());
   histo->Add(&histo_sub,1.);
+  histo->SetTitle(name.c_str());
   std::cout << "processed " << histo->GetName() << ": " << histo->GetEntries() << std::endl;
   return histo;
 };
@@ -162,16 +168,17 @@ TH2F* histo_var_vs_pt2(TChain* tree, std::string name,
 		 xbins, xmin, xmax,
 		 ybins, ymin, ymax);
   int n1 = tree->Draw(std::string(var+":"+tag+">>"+name+"_tag").c_str(),sel_tag.c_str(),"goff");
-  std::cout << "processed " << histo_tag.GetName() << ": " << n1 << std::endl;
+  //std::cout << "processed " << histo_tag.GetName() << ": " << n1 << std::endl;
   std::string sel_probe = tag+">="+probe; if ( !selection.empty() ) sel_probe += " && "+selection;
   TH2F histo_probe(std::string(name+"_probe").c_str(),
 		   std::string(name+"_probe").c_str(),
 		   xbins, xmin, xmax,
 		   ybins, ymin, ymax);
   int n2 = tree->Draw(std::string(var+":"+probe+">>"+name+"_probe").c_str(),sel_probe.c_str(),"goff");
-  std::cout << "processed " << histo_probe.GetName() << ": " << n2 << std::endl;
+  //std::cout << "processed " << histo_probe.GetName() << ": " << n2 << std::endl;
   TH2F* histo = (TH2F*)histo_tag.Clone(name.c_str());
   histo->Add(&histo_probe,1.);
+  histo->SetTitle(name.c_str());
   std::cout << "processed " << histo->GetName() << ": " << histo->GetEntries() << std::endl;
   return histo;
 };
