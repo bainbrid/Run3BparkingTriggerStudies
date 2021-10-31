@@ -39,24 +39,25 @@ def model(x, a, b, c, d):
 
 if __name__ == "__main__":
 
-  # read csv file
-  df = pd.read_csv('log_kee_bparkPU_v7.2_fullrange_pf.csv')
-  # define the range of fit
-  df_tofit = df.query('(cut > 4) and (cut < 8)')
-  # fit
-  popt, pcov = curve_fit(model, df_tofit['cut'], df_tofit['nbkg'])
-  print('fit: a=%5.3f, b=%5.3f, c=%5.3f, d=%5.3f' % tuple(popt))
+  inputs = ['log_kee_bparkPU_v7.2_fullrange_pf.csv',
+            'log_kee_bparkPU_v7.2_elePt5_pf.csv',
+            'log_kee_bparkPU_v7.2_fullrange_pf.csv',
+            ]
 
-  x = np.linspace(0, 10, 1000)
-  y = model(x, *popt)
-
-  fig, ax = plt.subplots()
-  ax.plot(df['cut'], df['nbkg'], 'bo', mec='b', linestyle="None", label="Data")
-  ax.plot(x, y, 'r-', label='fit: a=%5.3f, b=%5.3f, c=%5.3f, d=%5.3f' % tuple(popt))
-  ax.set_yscale('log')
-  ax.set_xlabel('MVA cut')
-  ax.set_ylabel('Number of background')
-  ax.legend(loc='best')
-  fig.savefig('fit.pdf', bbox_inches='tight')
-
+  for input in inputs :
+    df = pd.read_csv(input)
+    df_tofit = df.query('(cut > 4) and (cut < 8)') # define the range of fit
+    popt, pcov = curve_fit(model, df_tofit['cut'], df_tofit['nbkg'])
+    print('fit: a=%5.3f, b=%5.3f, c=%5.3f, d=%5.3f' % tuple(popt))
+    x = np.linspace(0, 10, 1000)
+    y = model(x, *popt)
+    fig, ax = plt.subplots()
+    ax.plot(df['cut'], df['nbkg'], 'bo', mec='b', linestyle="None", label="Data")
+    ax.plot(x, y, 'r-', label='file: '+input+', fit: a=%5.3f, b=%5.3f, c=%5.3f, d=%5.3f' % tuple(popt))
+    ax.set_yscale('log')
+    ax.set_xlabel('MVA cut')
+    ax.set_ylabel('Number of background')
+    ax.legend(loc='best')
+    fig.savefig('{:s}.pdf'.format(input), bbox_inches='tight')
+    
 
