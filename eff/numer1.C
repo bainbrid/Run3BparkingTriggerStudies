@@ -12,7 +12,7 @@ void numer1() {
   ////////////////////////////////////////////////////////////////////////////////
   // Opening files and config
 
-  int nfiles = 5;
+  int nfiles = 1e6;
   TChain* t = input("numer",nfiles);
   std::cout << "entries: " << t->GetEntries() << std::endl;
   // entries: TTree = 17050, TChain = 3137854
