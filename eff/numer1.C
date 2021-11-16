@@ -5,13 +5,15 @@
 #include "TH2F.h"
 #include <iostream>
 #include <string>
+#include <sstream>
 
 void numer1() {
 
   ////////////////////////////////////////////////////////////////////////////////
   // Opening files and config
 
-  TChain* t = input("numer");
+  int nfiles = 5;
+  TChain* t = input("numer",nfiles);
   std::cout << "entries: " << t->GetEntries() << std::endl;
   // entries: TTree = 17050, TChain = 3137854
 
@@ -31,12 +33,12 @@ void numer1() {
   TCut sel_acc_reco_eta = "abs(tag_eta)<2.5 && abs(probe_eta)<2.5";
   TCut sel_acc_reco = sel_acc_reco_pt && sel_acc_reco_eta;
 
+  // Analysis pre-selection
+  TCut sel_ana = "abs(k_svip3d)<0.06 && fit_Bcos2D>0.95";
+
   // Low q2 requirement
   TCut sel_lq2 = "(mll_fullfit*mll_fullfit)>1.1";
   sel_lq2 += "(mll_fullfit*mll_fullfit)<6.25";
-
-  // Analysis pre-selection
-  TCut sel_ana = "abs(k_svip3d)<0.06 && fit_Bcos2D>0.95";
 
   // Analysis BDT cut
   TCut sel_bdt = "analysisBdtO>8.";
@@ -60,8 +62,8 @@ void numer1() {
 	    << "  sel_sig:      " << sel_sig.GetTitle() << std::endl
 	    << "  sel_acc_gen:  " << sel_acc_gen.GetTitle() << std::endl
 	    << "  sel_acc_reco: " << sel_acc_reco.GetTitle() << std::endl
-	    << "  sel_lq2:      " << sel_lq2.GetTitle() << std::endl
 	    << "  sel_ana:      " << sel_ana.GetTitle() << std::endl
+	    << "  sel_lq2:      " << sel_lq2.GetTitle() << std::endl
 	    << "  sel_bdt:      " << sel_bdt.GetTitle() << std::endl
 	    << "  sel_cen:      " << sel_cen.GetTitle() << std::endl
 	    << "  sel_fwd:      " << sel_fwd.GetTitle() << std::endl
@@ -73,36 +75,37 @@ void numer1() {
 
   // Histos 2D (GEN e1 pT vs GEN e2 pT) after various selections
   TCut sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco;
-//  TH2F* numer_pt1_vs_pt2_sig = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_sig",
-//						sel_tmp.GetTitle(),
-//						xbins,xmin,xmax,xbins,xmin,xmax);
-//  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_lq2;
-//  TH2F* numer_pt1_vs_pt2_lq2 = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_lq2",
-//						sel_tmp.GetTitle(),
-//						xbins,xmin,xmax,xbins,xmin,xmax);
-//  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_lq2 && sel_ana;
-//  TH2F* numer_pt1_vs_pt2_ana = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_ana",
-//						sel_tmp.GetTitle(),
-//						xbins,xmin,xmax,xbins,xmin,xmax);
-//  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_lq2 && sel_ana && sel_bdt;
-//  TH2F* numer_pt1_vs_pt2_bdt = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_bdt",
-//						sel_tmp.GetTitle(),
-//						xbins,xmin,xmax,xbins,xmin,xmax);
+
+  TH2F* numer_pt1_vs_pt2_sig = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_sig",
+						sel_tmp.GetTitle(),
+						xbins,xmin,xmax,xbins,xmin,xmax);
+  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_ana;
+  TH2F* numer_pt1_vs_pt2_ana = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_ana",
+						sel_tmp.GetTitle(),
+						xbins,xmin,xmax,xbins,xmin,xmax);
+  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_ana && sel_lq2;
+  TH2F* numer_pt1_vs_pt2_lq2 = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_lq2",
+						sel_tmp.GetTitle(),
+						xbins,xmin,xmax,xbins,xmin,xmax);
+  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_ana && sel_lq2 && sel_bdt;
+  TH2F* numer_pt1_vs_pt2_bdt = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_bdt",
+						sel_tmp.GetTitle(),
+						xbins,xmin,xmax,xbins,xmin,xmax);
   
-  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_lq2 && sel_ana && sel_bdt && sel_cen;
+  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_ana && sel_lq2 && sel_bdt && sel_cen;
   TH2F* numer_pt1_vs_pt2_cen = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_cen",
 						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,xbins,xmin,xmax);
-  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_lq2 && sel_ana && sel_bdt && sel_fwd;
+  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_ana && sel_lq2 && sel_bdt && sel_fwd;
   TH2F* numer_pt1_vs_pt2_fwd = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_fwd",
 						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,xbins,xmin,xmax);
-  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_lq2 && sel_ana && sel_bdt && sel_sum;
+  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_ana && sel_lq2 && sel_bdt && sel_sum;
   TH2F* numer_pt1_vs_pt2_sum = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_sum",
 						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,xbins,xmin,xmax);
 
-//  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_lq2 && sel_ana && sel_bdt && sel_all;
+//  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_ana && sel_lq2 && sel_bdt && sel_all;
 //  TH2F* numer_pt1_vs_pt2_all = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_all",
 //						sel_tmp.GetTitle(),
 //						xbins,xmin,xmax,xbins,xmin,xmax);
@@ -121,15 +124,15 @@ void numer1() {
 //						      (sel_sig&&sel_lq2&&sel_eta&&sel_ana).GetTitle(),
 //						      xbins,xmin,xmax,21,-5.,16.);
 
-  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_lq2 && sel_ana && sel_cen;
+  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_ana && sel_lq2 && sel_cen;
   TH2F* numer_bdt_vs_pt2_cen = histo_var_vs_pt2(t,"numer_bdt_vs_pt2_cen","analysisBdtO",
 						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,21,-5.,16.);
-  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_lq2 && sel_ana && sel_fwd;
+  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_ana && sel_lq2 && sel_fwd;
   TH2F* numer_bdt_vs_pt2_fwd = histo_var_vs_pt2(t,"numer_bdt_vs_pt2_fwd","analysisBdtO",
 						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,21,-5.,16.);
-  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_lq2 && sel_ana && sel_sum;
+  sel_tmp = sel_sig && sel_acc_gen && sel_acc_reco && sel_ana && sel_lq2 && sel_sum;
   TH2F* numer_bdt_vs_pt2_sum = histo_var_vs_pt2(t,"numer_bdt_vs_pt2_sum","analysisBdtO",
 						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,21,-5.,16.);
@@ -155,12 +158,16 @@ void numer1() {
   // Output
 
   // Write to file
-  TFile fw("latest/numer.root","RECREATE");
+  std::stringstream output; 
+  if (nfiles>999) { output << "latest/numer.root"; }
+  else { output << "latest/numer_" << nfiles << ".root"; }
+  TFile fw(output.str().c_str(),"RECREATE");
+  std::cout << "filename: " << output.str().c_str() << std::endl;
   //
-//  numer_pt1_vs_pt2_sig->Write();
-//  numer_pt1_vs_pt2_lq2->Write();
-//  numer_pt1_vs_pt2_ana->Write();
-//  numer_pt1_vs_pt2_bdt->Write();
+  numer_pt1_vs_pt2_sig->Write();
+  numer_pt1_vs_pt2_ana->Write();
+  numer_pt1_vs_pt2_lq2->Write();
+  numer_pt1_vs_pt2_bdt->Write();
   numer_pt1_vs_pt2_cen->Write();
   numer_pt1_vs_pt2_fwd->Write();
   numer_pt1_vs_pt2_sum->Write();
