@@ -21,7 +21,7 @@ void numer1() {
   // Cuts
 
   // Trigger requirement
-  TCut sel_trg = "hlt9==1"; // "trg_muon_pt>9.";
+  TCut sel_trg = "trg_muon_pt>0."; //hlt9==1"; //"trg_muon_pt>9.";
   
   // GEN acceptance
   TCut sel_acc_gen_pt  = "tag_ptMc>0.5 && probe_ptMc>0.5";
@@ -79,7 +79,9 @@ void numer1() {
 
   // Histos 2D (GEN e1 pT vs GEN e2 pT) after various selections
   TCut sel_tmp = "";
-
+  TH2F* numer_pt1_vs_pt2_inc = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_inc",
+						sel_tmp.GetTitle(),
+						xbins,xmin,xmax,xbins,xmin,xmax);
   sel_tmp = sel_trg;
   TH2F* numer_pt1_vs_pt2_trg = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_trg",
 						sel_tmp.GetTitle(),
@@ -181,6 +183,7 @@ void numer1() {
   TFile fw(output.str().c_str(),"RECREATE");
   std::cout << "filename: " << output.str().c_str() << std::endl;
   //
+  numer_pt1_vs_pt2_inc->Write();
   numer_pt1_vs_pt2_trg->Write();
   numer_pt1_vs_pt2_acc->Write();
   numer_pt1_vs_pt2_rec->Write();
