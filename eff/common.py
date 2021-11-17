@@ -1,4 +1,4 @@
-from ROOT import TFile, TH2F, TCanvas, gStyle, gROOT, kTRUE
+from ROOT import TFile, TH2F, TCanvas, gStyle, gROOT, kTRUE, TLatex
 #import copy, math
 gROOT.SetBatch(kTRUE)
 
@@ -94,6 +94,13 @@ def drawHisto(histo,eff=False,logy=True,zmax=None):
     histo.GetXaxis().SetTitle("Sub-leading electron p_{T}^{gen} [GeV]")
     histo.GetXaxis().SetTitleOffset(1.3)
     histo.GetYaxis().SetTitle("Leading electron p_{T}^{gen} [GeV]")
+    # Title
+    histo.SetTitle("")
+    text = TLatex()
+    text.SetNDC()
+    text.SetTextSize(0.04)
+    text.DrawLatex(0.10,0.92,"#scale[1.2]{CMS} #it{Simulation (Internal)}")
+    text.DrawLatex(0.55,0.92,"#scale[1.2]{L_{int} = 100 fb^{-1}, #sqrt{s} = 13 TeV}")
     if eff: 
         gStyle.SetPaintTextFormat("4.2f");
         histo.SetMinimum(1.e-6)
@@ -105,6 +112,10 @@ def drawHisto(histo,eff=False,logy=True,zmax=None):
         histo.SetMinimum(0.1)
         if zmax is not None : histo.SetMaximum(zmax)
         histo.SetMarkerSize(1.)
+        # Labels
+        text.SetTextSize(0.03)
+        text.DrawLatex(0.7,0.25,"Entries: {:.1f}".format(histo.GetEntries())) 
+        text.DrawLatex(0.7,0.2,"Integral: {:.1f}".format(histo.Integral())) 
     if logy : canvas.SetLogz()
     return canvas
 
