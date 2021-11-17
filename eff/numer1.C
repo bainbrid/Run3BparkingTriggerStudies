@@ -20,11 +20,8 @@ void numer1() {
   ////////////////////////////////////////////////////////////////////////////////
   // Cuts
 
-  // GEN-match to signal
-  TCut sel_sig = "bmatchMC==1";
-
   // Trigger requirement
-  TCut sel_trg = "hlt9==1"; // "trg_muon_pt>9."
+  TCut sel_trg = "hlt9==1"; // "trg_muon_pt>9.";
   
   // GEN acceptance
   TCut sel_acc_gen_pt  = "tag_ptMc>0.5 && probe_ptMc>0.5";
@@ -35,6 +32,9 @@ void numer1() {
   TCut sel_acc_reco_pt  = "tag_pt>0.5 && probe_pt>0.5";
   TCut sel_acc_reco_eta = "abs(tag_eta)<2.5 && abs(probe_eta)<2.5";
   TCut sel_acc_reco = sel_acc_reco_pt && sel_acc_reco_eta;
+
+  // RECO-to-GEN-match to signal
+  TCut sel_sig = "bmatchMC==1";
 
   // Analysis pre-selection
   TCut sel_pre = "abs(k_svip3d)<0.06 && fit_Bcos2D>0.95";
@@ -51,21 +51,21 @@ void numer1() {
   TCut sel_fwd = !sel_cen;
 
   // Restrict all (RECO) eta reqs to within |eta| < 2.5
-  sel_cen += sel_acc_reco_eta;
-  sel_fwd += sel_acc_reco_eta;
+  sel_cen += sel_acc_reco_eta; //@@ RECO->GEN?
+  sel_fwd += sel_acc_reco_eta; //@@ RECO->GEN?
 
   // Sanity check
   TCut sel_sum = sel_cen || sel_fwd;
 
   // Everything
-  TCut sel_all = sel_sig && sel_trg && sel_acc_gen && sel_acc_reco && sel_pre && sel_lq2 && sel_bdt && sel_sum;
+  TCut sel_all = sel_trg && sel_acc_gen && sel_acc_reco && sel_sig && sel_pre && sel_lq2 && sel_bdt && sel_sum;
 
   // List selections
   std::cout << "selections:" << std::endl
-	    << "  sel_sig:      " << sel_sig.GetTitle() << std::endl
 	    << "  sel_trg:      " << sel_trg.GetTitle() << std::endl
 	    << "  sel_acc_gen:  " << sel_acc_gen.GetTitle() << std::endl
 	    << "  sel_acc_reco: " << sel_acc_reco.GetTitle() << std::endl
+	    << "  sel_sig:      " << sel_sig.GetTitle() << std::endl
 	    << "  sel_pre:      " << sel_pre.GetTitle() << std::endl
 	    << "  sel_lq2:      " << sel_lq2.GetTitle() << std::endl
 	    << "  sel_bdt:      " << sel_bdt.GetTitle() << std::endl
@@ -80,49 +80,49 @@ void numer1() {
   // Histos 2D (GEN e1 pT vs GEN e2 pT) after various selections
   TCut sel_tmp = "";
 
-  sel_tmp = sel_sig;
-  TH2F* numer_pt1_vs_pt2_sig = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_sig",
-						sel_tmp.GetTitle(),
-						xbins,xmin,xmax,xbins,xmin,xmax);
-  sel_tmp = sel_sig && sel_trg;
+  sel_tmp = sel_trg;
   TH2F* numer_pt1_vs_pt2_trg = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_trg",
 						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,xbins,xmin,xmax);
-  sel_tmp = sel_sig && sel_trg && sel_acc_gen;
+  sel_tmp = sel_trg && sel_acc_gen;
   TH2F* numer_pt1_vs_pt2_acc = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_acc",
 						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,xbins,xmin,xmax);
-  sel_tmp = sel_sig && sel_trg && sel_acc_gen && sel_acc_reco;
+  sel_tmp = sel_trg && sel_acc_gen && sel_acc_reco;
   TH2F* numer_pt1_vs_pt2_rec = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_rec",
 						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,xbins,xmin,xmax);
-  sel_tmp = sel_sig && sel_trg && sel_acc_gen && sel_acc_reco && sel_pre;
+  sel_tmp = sel_trg && sel_acc_gen && sel_acc_reco && sel_sig;
+  TH2F* numer_pt1_vs_pt2_sig = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_sig",
+						sel_tmp.GetTitle(),
+						xbins,xmin,xmax,xbins,xmin,xmax);
+  sel_tmp = sel_trg && sel_acc_gen && sel_acc_reco && sel_sig && sel_pre;
   TH2F* numer_pt1_vs_pt2_pre = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_pre",
 						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,xbins,xmin,xmax);
-  sel_tmp = sel_sig && sel_trg && sel_acc_gen && sel_acc_reco && sel_pre && sel_lq2;
+  sel_tmp = sel_trg && sel_acc_gen && sel_acc_reco && sel_sig && sel_pre && sel_lq2;
   TH2F* numer_pt1_vs_pt2_lq2 = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_lq2",
 						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,xbins,xmin,xmax);
-  sel_tmp = sel_sig && sel_trg && sel_acc_gen && sel_acc_reco && sel_pre && sel_lq2 && sel_bdt;
+  sel_tmp = sel_trg && sel_acc_gen && sel_acc_reco && sel_sig && sel_pre && sel_lq2 && sel_bdt;
   TH2F* numer_pt1_vs_pt2_bdt = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_bdt",
 						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,xbins,xmin,xmax);
   
-  sel_tmp = sel_sig && sel_trg && sel_acc_gen && sel_acc_reco && sel_pre && sel_lq2 && sel_bdt && sel_cen;
+  sel_tmp = sel_trg && sel_acc_gen && sel_acc_reco && sel_sig && sel_pre && sel_lq2 && sel_bdt && sel_cen;
   TH2F* numer_pt1_vs_pt2_cen = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_cen",
 						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,xbins,xmin,xmax);
-  sel_tmp = sel_sig && sel_trg && sel_acc_gen && sel_acc_reco && sel_pre && sel_lq2 && sel_bdt && sel_fwd;
+  sel_tmp = sel_trg && sel_acc_gen && sel_acc_reco && sel_sig && sel_pre && sel_lq2 && sel_bdt && sel_fwd;
   TH2F* numer_pt1_vs_pt2_fwd = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_fwd",
 						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,xbins,xmin,xmax);
-  sel_tmp = sel_sig && sel_trg && sel_acc_gen && sel_acc_reco && sel_pre && sel_lq2 && sel_bdt && sel_sum;
+  sel_tmp = sel_trg && sel_acc_gen && sel_acc_reco && sel_sig && sel_pre && sel_lq2 && sel_bdt && sel_sum;
   TH2F* numer_pt1_vs_pt2_sum = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_sum",
 						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,xbins,xmin,xmax);
 
-//  sel_tmp = sel_sig && sel_trg && sel_acc_gen && sel_acc_reco && sel_pre && sel_lq2 && sel_bdt && sel_all;
+//  sel_tmp = sel_trg && sel_acc_gen && sel_acc_reco && sel_sig && sel_pre && sel_lq2 && sel_bdt && sel_all;
 //  TH2F* numer_pt1_vs_pt2_all = histo_pt1_vs_pt2(t,"numer_pt1_vs_pt2_all",
 //						sel_tmp.GetTitle(),
 //						xbins,xmin,xmax,xbins,xmin,xmax);
@@ -154,7 +154,7 @@ void numer1() {
 						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,21,-5.,16.);
 
-//  // Histos 1D ("N-1" BDT) after various selections
+//  // Histos 1D ("N-1" BDT) after various selections //@@ SELECTIONS NEED UPDATING !!
 //  TH1F numer_bdt_sig = histo_var(t,"numer_bdt_sig","analysisBdtO",
 //				       sel_sig.GetTitle(),
 //				       21,-5.,16.);
@@ -181,10 +181,10 @@ void numer1() {
   TFile fw(output.str().c_str(),"RECREATE");
   std::cout << "filename: " << output.str().c_str() << std::endl;
   //
-  numer_pt1_vs_pt2_sig->Write();
   numer_pt1_vs_pt2_trg->Write();
   numer_pt1_vs_pt2_acc->Write();
   numer_pt1_vs_pt2_rec->Write();
+  numer_pt1_vs_pt2_sig->Write();
   numer_pt1_vs_pt2_pre->Write();
   numer_pt1_vs_pt2_lq2->Write();
   numer_pt1_vs_pt2_bdt->Write();
