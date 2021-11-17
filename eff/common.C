@@ -87,7 +87,7 @@ TChain* input(std::string name, int nfiles=1e6) {
   files.push_back(path+"690_700.root");
   files.push_back(path+"700_710.root");
   files.push_back(path+"70_80.root");
-  files.push_back(path+"710_720.root");
+  //files.push_back(path+"710_720.root"); //@@ corrupt?
   files.push_back(path+"720_730.root");
   files.push_back(path+"730_740.root");
   files.push_back(path+"740_750.root");
