@@ -100,3 +100,6 @@ class TreeProducerGen(TreeProducerCommon):
                     daughters.append(particle)
 
             return daughters
+
+    def addBranches(self,branches,type='i'):
+        for branch in branches: self.addBranch(branch,type)

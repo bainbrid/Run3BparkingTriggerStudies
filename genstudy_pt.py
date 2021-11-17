@@ -46,7 +46,22 @@ triggerPrescales, triggerPrescaleLabel  = Handle("pat::PackedTriggerPrescales"),
 # Trigger info
 #hlt_paths=["HLT_Mu7_IP4"]
 #hlt_paths=["HLT_Mu12_IP6"]
-hlt_paths=["HLT_Mu7_IP4","HLT_Mu8_IP6","HLT_Mu8_IP5","HLT_Mu8_IP3","HLT_Mu8p5_IP3p5","HLT_Mu9_IP6","HLT_Mu9_IP5","HLT_Mu9_IP4","HLT_Mu10p5_IP3p5","HLT_Mu12_IP6"]
+hlt_paths=[
+    #"HLT_Mu7_IP4",
+    #"HLT_Mu8_IP6",
+    #"HLT_Mu8_IP5",
+    #"HLT_Mu8_IP3",
+    #"HLT_Mu8p5_IP3p5",
+    "HLT_Mu9_IP6",
+    "HLT_Mu9_IP5",
+    "HLT_Mu9_IP4",
+    #"HLT_Mu10p5_IP3p5",
+    #"HLT_Mu12_IP6"
+]
+
+# Add branches
+hlt_paths = list(set(hlt_paths))
+out.addBranches(hlt_paths)
 
 trigger_indices=None
 trigger_debug=0
@@ -56,7 +71,7 @@ print "Starting event loop..."
 nanalyzed = 0
 ndropped = 0
 for ievent,ev in enumerate(events):
-    #if ievent > 10 : continue
+    #if ievent > 1000 : break
     if ievent%1000==0: print('{0:.1f}% processed'.format(Double(ievent)/Double(nevent)*100.))
     #print('{0:.0f} processed'.format(Double(ievent)))
 
@@ -68,25 +83,33 @@ for ievent,ev in enumerate(events):
     # Identify trigger indices (Assumes they don't change? So let's check every N events!)
     if ievent%100000==0 or trigger_indices==None:
         print "determine trigger indices..."
+        path_indices = []
         trigger_indices = []
         names = ev.object().triggerNames(triggerBits.product())
         for iname in xrange(triggerBits.product().size()):
-            for path in hlt_paths:
+            for ipath,path in enumerate(hlt_paths):
                 if path in names.triggerName(iname):
                     trigger_indices.append(iname)
+                    path_indices.append(ipath)
         trigger_indices = list(set(trigger_indices))
         print "trigger_indices",trigger_indices
+        print "path_indices",path_indices
+        print "hlt_paths",hlt_paths
 
     # Check if BParking trigger path fired
+    triggered_ = []
     triggered = False
-    for index in trigger_indices:
+    for idx,index in enumerate(trigger_indices):
         if triggerBits.product().accept(index):
             triggered = True
+            triggered_.append(hlt_paths[path_indices[idx]])
             if trigger_debug>0:
                 prescale = triggerPrescales.product().getPrescaleForIndex(index)
-                print "BParking trigger FIRED with index",\
-                    "{:.0f} and prescale {:.0f} in event {:.0f}!".format(index,prescale,ievent)
-            break
+                print "BParking trigger FIRED with path",\
+                    "{:s} and index {:.0f} and prescale {:.0f} in event {:.0f}!".format(names.triggerName(index),
+                                                                                        index,
+                                                                                        prescale,
+                                                                                        ievent)
 
     if trigger_debug>1 and triggered:
         print "\n === BPARKING PATHS ==="
@@ -118,11 +141,11 @@ for ievent,ev in enumerate(events):
                 ", prescale ",\
                 triggerPrescales.product().getPrescaleForIndex(i), ": ",\
                 ("PASS" if triggerBits.product().accept(i) else "fail (or not run)") 
+
+    if trigger_debug>3 :
         print "\n === TRIGGER OBJECTS ==="
         for j,to in enumerate(triggerObjects.product()):
             to.unpackPathNames(names)
-            #print([names.triggerName(i) for i in range(len(names))])
-            #to.unpackFilterLabels([str(names.triggerName(i)) for i in range(len(names))])
             to.unpackFilterLabels(ev.object(),triggerBits.product())
             print "Trigger object pt %6.2f eta %+5.3f phi %+5.3f  " % (to.pt(),to.eta(),to.phi())
             print "   collection: ", to.collection()
@@ -161,8 +184,6 @@ for ievent,ev in enumerate(events):
     genelectrons = sorted(genelectrons, key = lambda e : e.pt(), reverse = True )
     genmuons = sorted(genmuons, key = lambda mu : mu.pt(), reverse = True )
 
-    #print len(genelectrons)
-
     out.gen_e1_pt[0] = genelectrons[0].pt()
     out.gen_e1_eta[0] = genelectrons[0].eta()
     out.gen_e2_pt[0] = genelectrons[1].pt()
@@ -176,7 +197,13 @@ for ievent,ev in enumerate(events):
     out.ngenmuons[0] = len(genmuons)
     out.ngenelectrons[0] = len(genelectrons)
 
+    triggered_ = list(set(triggered_))
     out.trigger[0] = triggered
+    for path in hlt_paths:
+        attr = getattr(out,path,None)
+        if attr is not None:
+            if path in triggered_: attr[0] = 1
+            if path not in triggered_: attr[0] = 0
 
     out.tree.Fill()
     nanalyzed += 1
