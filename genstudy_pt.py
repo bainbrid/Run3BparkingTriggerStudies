@@ -47,16 +47,16 @@ triggerPrescales, triggerPrescaleLabel  = Handle("pat::PackedTriggerPrescales"),
 #hlt_paths=["HLT_Mu7_IP4"]
 #hlt_paths=["HLT_Mu12_IP6"]
 hlt_paths=[
-    #"HLT_Mu7_IP4",
-    #"HLT_Mu8_IP6",
-    #"HLT_Mu8_IP5",
-    #"HLT_Mu8_IP3",
-    #"HLT_Mu8p5_IP3p5",
+    "HLT_Mu7_IP4",
+    "HLT_Mu8_IP6",
+    "HLT_Mu8_IP5",
+    "HLT_Mu8_IP3",
+    "HLT_Mu8p5_IP3p5",
     "HLT_Mu9_IP6",
     "HLT_Mu9_IP5",
     "HLT_Mu9_IP4",
-    #"HLT_Mu10p5_IP3p5",
-    #"HLT_Mu12_IP6"
+    "HLT_Mu10p5_IP3p5",
+    "HLT_Mu12_IP6"
 ]
 
 # Add branches
