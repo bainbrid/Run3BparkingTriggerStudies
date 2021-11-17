@@ -57,7 +57,7 @@ nanalyzed = 0
 ndropped = 0
 for ievent,ev in enumerate(events):
     #if ievent > 10 : continue
-    if ievent%1000==0: print('{0:.f}% processed'.format(Double(ievent)/Double(nevent)*100.))
+    if ievent%1000==0: print('{0:.1f}% processed'.format(Double(ievent)/Double(nevent)*100.))
     #print('{0:.0f} processed'.format(Double(ievent)))
 
     # Get trigger collections
