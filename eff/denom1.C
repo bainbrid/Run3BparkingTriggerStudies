@@ -11,14 +11,16 @@ void denom1() {
   ////////////////////////////////////////////////////////////////////////////////
   // Opening files and config
 
+  int verbose = 1;
+
   TChain* t = input("denom");
-  std::cout << "entries: " << t->GetEntries() << std::endl;
+  if (verbose>0) std::cout << "entries: " << t->GetEntries() << std::endl;
 
   ////////////////////////////////////////////////////////////////////////////////
   // Cuts
 
   // Trigger
-  TCut sel_trg = "trigger==1"; // "HLT_Mu9_IP5==1";
+  TCut sel_trg = "trigger==1"; //"(HLT_Mu7_IP4==1 || HLT_Mu8_IP3==1 || HLT_Mu9_IP6==1)";
 
   // GEN acceptance
   TCut sel_acc_gen_pt  = "gen_e1_pt>0.5 && gen_e2_pt>0.5";
@@ -34,43 +36,56 @@ void denom1() {
   sel_fwd += sel_acc_gen_eta;
   
   // List selections
-  std::cout << "selections:" << std::endl
-	    << "  sel_trg:     " << sel_trg.GetTitle() << std::endl
-	    << "  sel_acc_gen: " << sel_acc_gen.GetTitle() << std::endl
-	    << "  sel_cen:     " << sel_cen.GetTitle() << std::endl
-	    << "  sel_fwd:     " << sel_fwd.GetTitle() << std::endl;
+  if (verbose>0)
+    std::cout << "selections:" << std::endl
+	      << "  sel_trg:     " << sel_trg.GetTitle() << std::endl
+	      << "  sel_acc_gen: " << sel_acc_gen.GetTitle() << std::endl
+	      << "  sel_cen:     " << sel_cen.GetTitle() << std::endl
+	      << "  sel_fwd:     " << sel_fwd.GetTitle() << std::endl;
 
   ////////////////////////////////////////////////////////////////////////////////
   // Histograms
 
   // Histos 2D (GEN e1 pT vs GEN e2 pT) after various selections
+  TCut sel_tmp = "";
+  if (verbose>1) std::cout << "sel_tmp, inc: " << sel_tmp.GetTitle() << std::endl;
   TH2F* denom_pt1_vs_pt2_inc = histo_pt1_vs_pt2(t,"denom_pt1_vs_pt2_inc",
-						"",
+						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,xbins,xmin,xmax,
 						"gen_e1_pt",
 						"gen_e2_pt");
+  sel_tmp = sel_trg;
+  if (verbose>1) std::cout << "sel_tmp, trg: " << sel_tmp.GetTitle() << std::endl;
   TH2F* denom_pt1_vs_pt2_trg = histo_pt1_vs_pt2(t,"denom_pt1_vs_pt2_trg",
-						(sel_trg).GetTitle(),
+						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,xbins,xmin,xmax,
 						"gen_e1_pt",
 						"gen_e2_pt");
+  sel_tmp = sel_trg && sel_acc_gen;
+  if (verbose>1) std::cout << "sel_tmp, acc: " << sel_tmp.GetTitle() << std::endl;
   TH2F* denom_pt1_vs_pt2_acc = histo_pt1_vs_pt2(t,"denom_pt1_vs_pt2_acc",
-						(sel_trg&&sel_acc_gen).GetTitle(),
+						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,xbins,xmin,xmax,
 						"gen_e1_pt",
 						"gen_e2_pt");
+  sel_tmp = sel_trg && sel_acc_gen && sel_cen;
+  if (verbose>1) std::cout << "sel_tmp, cen: " << sel_tmp.GetTitle() << std::endl;
   TH2F* denom_pt1_vs_pt2_cen = histo_pt1_vs_pt2(t,"denom_pt1_vs_pt2_cen",
-						(sel_trg&&sel_acc_gen&&sel_cen).GetTitle(),
+						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,xbins,xmin,xmax,
 						"gen_e1_pt",
 						"gen_e2_pt");
+  sel_tmp = sel_trg && sel_acc_gen && sel_fwd;
+  if (verbose>1) std::cout << "sel_tmp, fwd: " << sel_tmp.GetTitle() << std::endl;
   TH2F* denom_pt1_vs_pt2_fwd = histo_pt1_vs_pt2(t,"denom_pt1_vs_pt2_fwd",
-						(sel_trg&&sel_acc_gen&&sel_fwd).GetTitle(),
+						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,xbins,xmin,xmax,
 						"gen_e1_pt",
 						"gen_e2_pt");
+  sel_tmp = sel_trg && sel_acc_gen && ( sel_cen || sel_fwd );
+  if (verbose>1) std::cout << "sel_tmp, sum: " << sel_tmp.GetTitle() << std::endl;
   TH2F* denom_pt1_vs_pt2_sum = histo_pt1_vs_pt2(t,"denom_pt1_vs_pt2_sum",
-						(sel_trg&&sel_acc_gen&&(sel_cen||sel_fwd)).GetTitle(),
+						sel_tmp.GetTitle(),
 						xbins,xmin,xmax,xbins,xmin,xmax,
 						"gen_e1_pt",
 						"gen_e2_pt");
