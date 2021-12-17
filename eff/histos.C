@@ -260,45 +260,45 @@ void histos() {
   TFile fw(output.str().c_str(),"RECREATE");
   std::cout << "filename: " << output.str().c_str() << std::endl;
 
-//  histo_pt1_vs_pt2_inc.sum_->Write();
-//  histo_pt1_vs_pt2_inc.cen_->Write();
-//  histo_pt1_vs_pt2_inc.fwd_->Write();
-//
-//  histo_pt1_vs_pt2_trg.sum_->Write();
-//  histo_pt1_vs_pt2_trg.cen_->Write();
-//  histo_pt1_vs_pt2_trg.sum_->Write();
-//
-//  histo_pt1_vs_pt2_kee.fwd_->Write();
-//  histo_pt1_vs_pt2_kee.cen_->Write();
-//  histo_pt1_vs_pt2_kee.sum_->Write();
-//
-//  histo_pt1_vs_pt2_acc.sum_->Write();
-//  histo_pt1_vs_pt2_acc.cen_->Write();
-//  histo_pt1_vs_pt2_acc.fwd_->Write();
-//
-//  histo_pt1_vs_pt2_gen.sum_->Write();
-//  histo_pt1_vs_pt2_gen.cen_->Write();
-//  histo_pt1_vs_pt2_gen.fwd_->Write();
-//
-//  histo_pt1_vs_pt2_sig.sum_->Write();
-//  histo_pt1_vs_pt2_sig.cen_->Write();
-//  histo_pt1_vs_pt2_sig.fwd_->Write();
-//
-//  histo_pt1_vs_pt2_rec.sum_->Write();
-//  histo_pt1_vs_pt2_rec.cen_->Write();
-//  histo_pt1_vs_pt2_rec.fwd_->Write();
-//
-//  histo_pt1_vs_pt2_cat.sum_->Write();
-//  histo_pt1_vs_pt2_cat.cen_->Write();
-//  histo_pt1_vs_pt2_cat.fwd_->Write();
-//
-//  histo_pt1_vs_pt2_pre.sum_->Write();
-//  histo_pt1_vs_pt2_pre.cen_->Write();
-//  histo_pt1_vs_pt2_pre.fwd_->Write();
-//
-//  histo_pt1_vs_pt2_bdt.sum_->Write();
-//  histo_pt1_vs_pt2_bdt.cen_->Write();
-//  histo_pt1_vs_pt2_bdt.fwd_->Write();
+  histo_pt1_vs_pt2_inc.sum_->Write();
+  histo_pt1_vs_pt2_inc.cen_->Write();
+  histo_pt1_vs_pt2_inc.fwd_->Write();
+
+  histo_pt1_vs_pt2_trg.sum_->Write();
+  histo_pt1_vs_pt2_trg.cen_->Write();
+  histo_pt1_vs_pt2_trg.sum_->Write();
+
+  histo_pt1_vs_pt2_kee.fwd_->Write();
+  histo_pt1_vs_pt2_kee.cen_->Write();
+  histo_pt1_vs_pt2_kee.sum_->Write();
+
+  histo_pt1_vs_pt2_acc.sum_->Write();
+  histo_pt1_vs_pt2_acc.cen_->Write();
+  histo_pt1_vs_pt2_acc.fwd_->Write();
+
+  histo_pt1_vs_pt2_gen.sum_->Write();
+  histo_pt1_vs_pt2_gen.cen_->Write();
+  histo_pt1_vs_pt2_gen.fwd_->Write();
+
+  histo_pt1_vs_pt2_sig.sum_->Write();
+  histo_pt1_vs_pt2_sig.cen_->Write();
+  histo_pt1_vs_pt2_sig.fwd_->Write();
+
+  histo_pt1_vs_pt2_rec.sum_->Write();
+  histo_pt1_vs_pt2_rec.cen_->Write();
+  histo_pt1_vs_pt2_rec.fwd_->Write();
+
+  histo_pt1_vs_pt2_cat.sum_->Write();
+  histo_pt1_vs_pt2_cat.cen_->Write();
+  histo_pt1_vs_pt2_cat.fwd_->Write();
+
+  histo_pt1_vs_pt2_pre.sum_->Write();
+  histo_pt1_vs_pt2_pre.cen_->Write();
+  histo_pt1_vs_pt2_pre.fwd_->Write();
+
+  histo_pt1_vs_pt2_bdt.sum_->Write();
+  histo_pt1_vs_pt2_bdt.cen_->Write();
+  histo_pt1_vs_pt2_bdt.fwd_->Write();
 
   histo_pt1_vs_pt2_lq2.sum_->Write();
   histo_pt1_vs_pt2_lq2.cen_->Write();
