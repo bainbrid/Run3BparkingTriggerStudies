@@ -102,8 +102,8 @@ def drawHisto(histo,eff=False,logy=True,zmax=None):
     text.DrawLatex(0.10,0.92,"#scale[1.2]{CMS} #it{Simulation (Internal)}")
     text.DrawLatex(0.55,0.92,"#scale[1.2]{L_{int} = 100 fb^{-1}, #sqrt{s} = 13 TeV}")
     if eff: 
-        gStyle.SetPaintTextFormat("4.2f");
-        histo.SetMinimum(1.e-6)
+        gStyle.SetPaintTextFormat("5.3f");
+        histo.SetMinimum(1.e-4)
         if zmax is not None : histo.SetMaximum(zmax)
         else : histo.SetMaximum(1.)
         histo.SetMarkerSize(1.6)
@@ -123,12 +123,18 @@ def drawHisto(histo,eff=False,logy=True,zmax=None):
 # 
 def writeHisto(output,input,name,title,scale=None,logy=True,zmax=None,xcumu=None,ycumu=None):
     histo = getHisto(input,name,title)
-    histo = cumuHisto(histo,xcumu=xcumu,ycumu=ycumu)
-    if scale is not None : histo.Scale(scale)
+    if scale != None : histo.Scale(scale)
     canvas = drawHisto(histo,False,logy,zmax)
     canvas.SaveAs("latest/{:s}.pdf".format(title)) 
     output.cd()
     histo.Write()
+    if xcumu != None or ycumu != None :
+        cumu = cumuHisto(histo,xcumu=xcumu,ycumu=ycumu)
+        canvas = drawHisto(cumu,False,logy,zmax)
+        canvas.SaveAs("latest/{:s}_cumu.pdf".format(title)) 
+        output.cd()
+        cumu.Write()
+        return cumu
     return histo
 
 ################################################################################
@@ -160,6 +166,7 @@ def writeEff(output,numer,denom,title,zmax=None):
 def transformDenom(output,numer,denom,title):
     #cumu = cumuHisto(denom,xcumu=None,ycumu="int") # Diff in pT
     cumu = cumuHisto(denom,xcumu="gt",ycumu="gt") # Cumu in pT
+    #cumu = cumuHisto(denom,xcumu="int",ycumu="int") # Cumu in pT
     denom = numer.Clone(title)
     denom.SetDirectory(0)
     denom.SetTitle(title)
