@@ -8,39 +8,30 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Binning for histograms (2D)
 
-int nbins = 12; float width = 1.; //nbins = 3; width = 4.;
+int nbins = 12; float width = 1.;
+
 int xbins = nbins;
 float xmin = 0.;
 float xmax = nbins*width;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return TChain
-TChain* input(std::string name, int nfiles=1e6) {
-  if (name=="numer") {
-    std::string path="/Users/bainbrid/Desktop/Trigger/";
-    std::vector<std::string> files;
-    //files.push_back(path+"mc_BuToKee_temp.root");
-    //files.push_back(path+"mc_BuToKee_2021Dec01.root");
-    //files.push_back(path+"mc_BuToKee_2021Dec16_temp.root"); // 1 file
-    files.push_back(path+"mc_BuToKee_2021Dec16.root");
-    int cntr = 0;
-    nfiles = std::min(int(files.size()),nfiles);
-    TChain* tree = new TChain("tree");
-    for ( int ifile=0; ifile<nfiles; ++ifile) { 
-      tree->Add(files[ifile].c_str()); 
-      ++cntr; 
-      std::cout << "processed " << cntr << " files..." << std::endl;
+TChain* input(int nfiles=1e6) {
+  std::string path="/Users/bainbrid/Desktop/Trigger/";
+  std::vector<std::string> files;
+  //files.push_back(path+"mc_BuToKee_temp.root");
+  //files.push_back(path+"mc_BuToKee_2021Dec16_temp.root"); // 1 file
+  //files.push_back(path+"mc_BuToKee_2021Dec01.root");
+  files.push_back(path+"mc_BuToKee_2021Dec16.root");
+  int cntr = 0;
+  nfiles = std::min(int(files.size()),nfiles);
+  TChain* tree = new TChain("tree");
+  for ( int ifile=0; ifile<nfiles; ++ifile) { 
+    tree->Add(files[ifile].c_str()); 
+    ++cntr; 
+    std::cout << "processed " << cntr << " files..." << std::endl;
     }
-    return tree;
-  } else if (name=="denom") {
-    TChain* tree = new TChain("tree");
-    tree->Add("root/genstudy_pt.root");
-    return tree;
-  } else {
-    std::cout << "unknown input!" << std::endl;
-    return 0;
-  }
-
+  return tree;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

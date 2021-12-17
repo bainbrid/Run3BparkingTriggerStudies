@@ -1,14 +1,12 @@
 from ROOT import TFile
 from common import *
 
-
 ################################################################################
 # Inputs and outputs
-outputs = {}
-output = TFile('latest/eff.root','RECREATE')
 
-input_denom = "latest/denom.root"
-input_numer = "latest/numer.root"
+input = "latest/numer.root"
+output = TFile('latest/eff.root','RECREATE')
+outputs = {}
 
 ################################################################################
 # Scaling
@@ -46,42 +44,42 @@ numer_scale *= lumi_scale
 # All numer and denom histograms for pt1_vs_pt2
 inputs_pt = [
     # numer, unweighted
-    (input_numer,"numer_pt1_vs_pt2_inc","numer_pt1_vs_pt2_inc_unweighted",None,True,1.e6),
-    (input_numer,"numer_pt1_vs_pt2_trg","numer_pt1_vs_pt2_trg_unweighted",None,True,1.e6),
-    (input_numer,"numer_pt1_vs_pt2_kee","numer_pt1_vs_pt2_kee_unweighted",None,True,1.e6),
-    (input_numer,"numer_pt1_vs_pt2_acc","numer_pt1_vs_pt2_acc_unweighted",None,True,1.e6),
-    (input_numer,"numer_pt1_vs_pt2_gen","numer_pt1_vs_pt2_gen_unweighted",None,True,1.e6),
-    (input_numer,"numer_pt1_vs_pt2_sig","numer_pt1_vs_pt2_sig_unweighted",None,True,1.e6),
-    (input_numer,"numer_pt1_vs_pt2_rec","numer_pt1_vs_pt2_rec_unweighted",None,True,1.e6),
-    (input_numer,"numer_pt1_vs_pt2_cat","numer_pt1_vs_pt2_cat_unweighted",None,True,1.e6),
-    (input_numer,"numer_pt1_vs_pt2_pre","numer_pt1_vs_pt2_pre_unweighted",None,True,1.e6),
-    (input_numer,"numer_pt1_vs_pt2_bdt","numer_pt1_vs_pt2_bdt_unweighted",None,True,1.e6),
-    (input_numer,"numer_pt1_vs_pt2_gen_cen","numer_pt1_vs_pt2_gen_cen_unweighted",None,True,1.e6),
-    (input_numer,"numer_pt1_vs_pt2_gen_fwd","numer_pt1_vs_pt2_gen_fwd_unweighted",None,True,1.e6),
-    (input_numer,"numer_pt1_vs_pt2_cat_cen","numer_pt1_vs_pt2_cat_cen_unweighted",None,True,1.e6),
-    (input_numer,"numer_pt1_vs_pt2_cat_fwd","numer_pt1_vs_pt2_cat_fwd_unweighted",None,True,1.e6),
-    (input_numer,"numer_pt1_vs_pt2_bdt_cen","numer_pt1_vs_pt2_bdt_cen_unweighted",None,True,1.e6),
-    (input_numer,"numer_pt1_vs_pt2_bdt_fwd","numer_pt1_vs_pt2_bdt_fwd_unweighted",None,True,1.e6),
+    (input,"numer_pt1_vs_pt2_inc","numer_pt1_vs_pt2_inc_unweighted",None,True,1.e6),
+    (input,"numer_pt1_vs_pt2_trg","numer_pt1_vs_pt2_trg_unweighted",None,True,1.e6),
+    (input,"numer_pt1_vs_pt2_kee","numer_pt1_vs_pt2_kee_unweighted",None,True,1.e6),
+    (input,"numer_pt1_vs_pt2_acc","numer_pt1_vs_pt2_acc_unweighted",None,True,1.e6),
+    (input,"numer_pt1_vs_pt2_gen","numer_pt1_vs_pt2_gen_unweighted",None,True,1.e6),
+    (input,"numer_pt1_vs_pt2_sig","numer_pt1_vs_pt2_sig_unweighted",None,True,1.e6),
+    (input,"numer_pt1_vs_pt2_rec","numer_pt1_vs_pt2_rec_unweighted",None,True,1.e6),
+    (input,"numer_pt1_vs_pt2_cat","numer_pt1_vs_pt2_cat_unweighted",None,True,1.e6),
+    (input,"numer_pt1_vs_pt2_pre","numer_pt1_vs_pt2_pre_unweighted",None,True,1.e6),
+    (input,"numer_pt1_vs_pt2_bdt","numer_pt1_vs_pt2_bdt_unweighted",None,True,1.e6),
+    (input,"numer_pt1_vs_pt2_gen_cen","numer_pt1_vs_pt2_gen_cen_unweighted",None,True,1.e6),
+    (input,"numer_pt1_vs_pt2_gen_fwd","numer_pt1_vs_pt2_gen_fwd_unweighted",None,True,1.e6),
+    (input,"numer_pt1_vs_pt2_cat_cen","numer_pt1_vs_pt2_cat_cen_unweighted",None,True,1.e6),
+    (input,"numer_pt1_vs_pt2_cat_fwd","numer_pt1_vs_pt2_cat_fwd_unweighted",None,True,1.e6),
+    (input,"numer_pt1_vs_pt2_bdt_cen","numer_pt1_vs_pt2_bdt_cen_unweighted",None,True,1.e6),
+    (input,"numer_pt1_vs_pt2_bdt_fwd","numer_pt1_vs_pt2_bdt_fwd_unweighted",None,True,1.e6),
     # numer, weighted
-    (input_numer,"numer_pt1_vs_pt2_inc","numer_pt1_vs_pt2_inc_weighted",numer_scale,True,1.e3),
-    (input_numer,"numer_pt1_vs_pt2_trg","numer_pt1_vs_pt2_trg_weighted",numer_scale,True,1.e3),
-    (input_numer,"numer_pt1_vs_pt2_kee","numer_pt1_vs_pt2_kee_weighted",numer_scale,True,1.e3),
-    (input_numer,"numer_pt1_vs_pt2_acc","numer_pt1_vs_pt2_acc_weighted",numer_scale,True,1.e3),
-    (input_numer,"numer_pt1_vs_pt2_gen","numer_pt1_vs_pt2_gen_weighted",numer_scale,True,1.e3),
-    (input_numer,"numer_pt1_vs_pt2_sig","numer_pt1_vs_pt2_sig_weighted",numer_scale,True,1.e3),
-    (input_numer,"numer_pt1_vs_pt2_rec","numer_pt1_vs_pt2_rec_weighted",numer_scale,True,1.e3),
-    (input_numer,"numer_pt1_vs_pt2_cat","numer_pt1_vs_pt2_cat_weighted",numer_scale,True,1.e3),
-    (input_numer,"numer_pt1_vs_pt2_pre","numer_pt1_vs_pt2_pre_weighted",numer_scale,True,1.e3),
-    (input_numer,"numer_pt1_vs_pt2_bdt","numer_pt1_vs_pt2_bdt_weighted",numer_scale,True,1.e3),
-    (input_numer,"numer_pt1_vs_pt2_gen_cen","numer_pt1_vs_pt2_gen_cen_weighted",numer_scale,True,1.e3),
-    (input_numer,"numer_pt1_vs_pt2_gen_fwd","numer_pt1_vs_pt2_gen_fwd_weighted",numer_scale,True,1.e3),
-    (input_numer,"numer_pt1_vs_pt2_cat_cen","numer_pt1_vs_pt2_cat_cen_weighted",numer_scale,True,1.e3),
-    (input_numer,"numer_pt1_vs_pt2_cat_fwd","numer_pt1_vs_pt2_cat_fwd_weighted",numer_scale,True,1.e3),
-    (input_numer,"numer_pt1_vs_pt2_bdt_cen","numer_pt1_vs_pt2_bdt_cen_weighted",numer_scale,True,1.e3),
-    (input_numer,"numer_pt1_vs_pt2_bdt_fwd","numer_pt1_vs_pt2_bdt_fwd_weighted",numer_scale,True,1.e3),
+    (input,"numer_pt1_vs_pt2_inc","numer_pt1_vs_pt2_inc_weighted",numer_scale,True,1.e3),
+    (input,"numer_pt1_vs_pt2_trg","numer_pt1_vs_pt2_trg_weighted",numer_scale,True,1.e3),
+    (input,"numer_pt1_vs_pt2_kee","numer_pt1_vs_pt2_kee_weighted",numer_scale,True,1.e3),
+    (input,"numer_pt1_vs_pt2_acc","numer_pt1_vs_pt2_acc_weighted",numer_scale,True,1.e3),
+    (input,"numer_pt1_vs_pt2_gen","numer_pt1_vs_pt2_gen_weighted",numer_scale,True,1.e3),
+    (input,"numer_pt1_vs_pt2_sig","numer_pt1_vs_pt2_sig_weighted",numer_scale,True,1.e3),
+    (input,"numer_pt1_vs_pt2_rec","numer_pt1_vs_pt2_rec_weighted",numer_scale,True,1.e3),
+    (input,"numer_pt1_vs_pt2_cat","numer_pt1_vs_pt2_cat_weighted",numer_scale,True,1.e3),
+    (input,"numer_pt1_vs_pt2_pre","numer_pt1_vs_pt2_pre_weighted",numer_scale,True,1.e3),
+    (input,"numer_pt1_vs_pt2_bdt","numer_pt1_vs_pt2_bdt_weighted",numer_scale,True,1.e3),
+    (input,"numer_pt1_vs_pt2_gen_cen","numer_pt1_vs_pt2_gen_cen_weighted",numer_scale,True,1.e3),
+    (input,"numer_pt1_vs_pt2_gen_fwd","numer_pt1_vs_pt2_gen_fwd_weighted",numer_scale,True,1.e3),
+    (input,"numer_pt1_vs_pt2_cat_cen","numer_pt1_vs_pt2_cat_cen_weighted",numer_scale,True,1.e3),
+    (input,"numer_pt1_vs_pt2_cat_fwd","numer_pt1_vs_pt2_cat_fwd_weighted",numer_scale,True,1.e3),
+    (input,"numer_pt1_vs_pt2_bdt_cen","numer_pt1_vs_pt2_bdt_cen_weighted",numer_scale,True,1.e3),
+    (input,"numer_pt1_vs_pt2_bdt_fwd","numer_pt1_vs_pt2_bdt_fwd_weighted",numer_scale,True,1.e3),
     #
-    #(input_numer,"numer_pt1_vs_pt2_dr","numer_pt1_vs_pt2_dr_unweighted",None,True,1.e6),
-    #(input_numer,"numer_pt1_vs_pt2_dr","numer_pt1_vs_pt2_dr_weighted",numer_scale,True,3.e2),
+    #(input,"numer_pt1_vs_pt2_dr","numer_pt1_vs_pt2_dr_unweighted",None,True,1.e6),
+    #(input,"numer_pt1_vs_pt2_dr","numer_pt1_vs_pt2_dr_weighted",numer_scale,True,3.e2),
 ]
 for input,name,title,scale,logy,zmax in inputs_pt:
     print("inputs_pt:",name,title)
@@ -91,12 +89,12 @@ for input,name,title,scale,logy,zmax in inputs_pt:
 # All numer and denom histograms for bdt_vs_pt2
 inputs_bdt = [
     # bdt_vs_pt2, unweighted
-    (input_numer,"numer_bdt_vs_pt2_sum","numer_bdt_vs_pt2_sum_weighted",numer_scale,True,5.e3,"gt","gt"),
-    (input_numer,"numer_pre_vs_pt2_sum","numer_pre_vs_pt2_sum_weighted",numer_scale,True,5.e3,"gt","gt"),
-    #(input_numer,"numer_bdt_vs_pt2_cen","numer_bdt_vs_pt2_cen_weighted",numer_scale,True,5.e3,"gt","gt"),
-    #(input_numer,"numer_bdt_vs_pt2_fwd","numer_bdt_vs_pt2_fwd_weighted",numer_scale,True,5.e3,"gt","gt"),
-    #(input_numer,"numer_dr_vs_pt2","numer_dr_vs_pt2_weighted",numer_scale,True,5.e3,None,"lt"),
-    #(input_numer,"denom_dr_vs_pt2","denom_dr_vs_pt2_weighted",numer_scale,True,5.e3,None,"lt"),
+    (input,"numer_bdt_vs_pt2_sum","numer_bdt_vs_pt2_sum_weighted",numer_scale,True,5.e3,"gt","gt"),
+    (input,"numer_pre_vs_pt2_sum","numer_pre_vs_pt2_sum_weighted",numer_scale,True,5.e3,"gt","gt"),
+    #(input,"numer_bdt_vs_pt2_cen","numer_bdt_vs_pt2_cen_weighted",numer_scale,True,5.e3,"gt","gt"),
+    #(input,"numer_bdt_vs_pt2_fwd","numer_bdt_vs_pt2_fwd_weighted",numer_scale,True,5.e3,"gt","gt"),
+    #(input,"numer_dr_vs_pt2","numer_dr_vs_pt2_weighted",numer_scale,True,5.e3,None,"lt"),
+    #(input,"denom_dr_vs_pt2","denom_dr_vs_pt2_weighted",numer_scale,True,5.e3,None,"lt"),
 ]
 for input,name,title,scale,logy,zmax,xcumu,ycumu in inputs_bdt:
     print("inputs_bdt:",name,xcumu,ycumu)
@@ -188,25 +186,25 @@ output.Close()
 ################################################################################
 ################################################################################
 
-#    (input_numer,"numer_pt1_vs_pt2_sig","numer_pt1_vs_pt2_sig_unweighted",None,True,1.e6),#@@
-#    (input_numer,"numer_pt1_vs_pt2_gen","numer_pt1_vs_pt2_gen_unweighted",None,True,1.e6),#@@
-#    (input_numer,"numer_pt1_vs_pt2_rec","numer_pt1_vs_pt2_rec_unweighted",None,True,1.e6),#@@
+#    (input,"numer_pt1_vs_pt2_sig","numer_pt1_vs_pt2_sig_unweighted",None,True,1.e6),#@@
+#    (input,"numer_pt1_vs_pt2_gen","numer_pt1_vs_pt2_gen_unweighted",None,True,1.e6),#@@
+#    (input,"numer_pt1_vs_pt2_rec","numer_pt1_vs_pt2_rec_unweighted",None,True,1.e6),#@@
 
-#    (input_numer,"numer_pt1_vs_pt2_kee0","numer_pt1_vs_pt2_kee0_unweighted",None,True,1.e6),#@@
-#    (input_numer,"numer_pt1_vs_pt2_acc0","numer_pt1_vs_pt2_acc0_unweighted",None,True,1.e6),#@@
-#    (input_numer,"numer_pt1_vs_pt2_rec0","numer_pt1_vs_pt2_rec0_unweighted",None,True,1.e6),#@@
-#    (input_numer,"numer_pt1_vs_pt2_kee1","numer_pt1_vs_pt2_kee1_unweighted",None,True,1.e6),#@@
-#    (input_numer,"numer_pt1_vs_pt2_acc1","numer_pt1_vs_pt2_acc1_unweighted",None,True,1.e6),#@@
-#    (input_numer,"numer_pt1_vs_pt2_rec1","numer_pt1_vs_pt2_rec1_unweighted",None,True,1.e6),#@@
-#    (input_numer,"numer_pt1_vs_pt2_kee2","numer_pt1_vs_pt2_kee2_unweighted",None,True,1.e6),#@@
-#    (input_numer,"numer_pt1_vs_pt2_acc2","numer_pt1_vs_pt2_acc2_unweighted",None,True,1.e6),#@@
-#    (input_numer,"numer_pt1_vs_pt2_rec2","numer_pt1_vs_pt2_rec2_unweighted",None,True,1.e6),#@@
-#    (input_numer,"numer_pt1_vs_pt2_kee3","numer_pt1_vs_pt2_kee3_unweighted",None,True,1.e6),#@@
-#    (input_numer,"numer_pt1_vs_pt2_acc3","numer_pt1_vs_pt2_acc3_unweighted",None,True,1.e6),#@@
-#    (input_numer,"numer_pt1_vs_pt2_rec3","numer_pt1_vs_pt2_rec3_unweighted",None,True,1.e6),#@@
-#    (input_numer,"numer_pt1_vs_pt2_kee4","numer_pt1_vs_pt2_kee4_unweighted",None,True,1.e6),#@@
-#    (input_numer,"numer_pt1_vs_pt2_acc4","numer_pt1_vs_pt2_acc4_unweighted",None,True,1.e6),#@@
-#    (input_numer,"numer_pt1_vs_pt2_rec4","numer_pt1_vs_pt2_rec4_unweighted",None,True,1.e6),#@@
+#    (input,"numer_pt1_vs_pt2_kee0","numer_pt1_vs_pt2_kee0_unweighted",None,True,1.e6),#@@
+#    (input,"numer_pt1_vs_pt2_acc0","numer_pt1_vs_pt2_acc0_unweighted",None,True,1.e6),#@@
+#    (input,"numer_pt1_vs_pt2_rec0","numer_pt1_vs_pt2_rec0_unweighted",None,True,1.e6),#@@
+#    (input,"numer_pt1_vs_pt2_kee1","numer_pt1_vs_pt2_kee1_unweighted",None,True,1.e6),#@@
+#    (input,"numer_pt1_vs_pt2_acc1","numer_pt1_vs_pt2_acc1_unweighted",None,True,1.e6),#@@
+#    (input,"numer_pt1_vs_pt2_rec1","numer_pt1_vs_pt2_rec1_unweighted",None,True,1.e6),#@@
+#    (input,"numer_pt1_vs_pt2_kee2","numer_pt1_vs_pt2_kee2_unweighted",None,True,1.e6),#@@
+#    (input,"numer_pt1_vs_pt2_acc2","numer_pt1_vs_pt2_acc2_unweighted",None,True,1.e6),#@@
+#    (input,"numer_pt1_vs_pt2_rec2","numer_pt1_vs_pt2_rec2_unweighted",None,True,1.e6),#@@
+#    (input,"numer_pt1_vs_pt2_kee3","numer_pt1_vs_pt2_kee3_unweighted",None,True,1.e6),#@@
+#    (input,"numer_pt1_vs_pt2_acc3","numer_pt1_vs_pt2_acc3_unweighted",None,True,1.e6),#@@
+#    (input,"numer_pt1_vs_pt2_rec3","numer_pt1_vs_pt2_rec3_unweighted",None,True,1.e6),#@@
+#    (input,"numer_pt1_vs_pt2_kee4","numer_pt1_vs_pt2_kee4_unweighted",None,True,1.e6),#@@
+#    (input,"numer_pt1_vs_pt2_acc4","numer_pt1_vs_pt2_acc4_unweighted",None,True,1.e6),#@@
+#    (input,"numer_pt1_vs_pt2_rec4","numer_pt1_vs_pt2_rec4_unweighted",None,True,1.e6),#@@
 
 #    ("numer_pt1_vs_pt2_rec_unweighted","numer_pt1_vs_pt2_acc_unweighted","eff_pt1_vs_pt2_rec_unweighted",1.),#@@
 #    ("numer_pt1_vs_pt2_acc0_unweighted","numer_pt1_vs_pt2_kee0_unweighted","eff_pt1_vs_pt2_acc0_unweighted",1.),#@@
