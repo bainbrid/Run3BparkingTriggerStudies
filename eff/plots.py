@@ -41,36 +41,95 @@ histo_scale *= lumi_scale
 inputs_pt = [
     # numer, unweighted
     (input,"histo_pt1_vs_pt2_inc","histo_pt1_vs_pt2_inc_unweighted",None,True,1.e6),
+
     (input,"histo_pt1_vs_pt2_trg","histo_pt1_vs_pt2_trg_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_trg_cen","histo_pt1_vs_pt2_trg_cen_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_trg_fwd","histo_pt1_vs_pt2_trg_fwd_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_trg9","histo_pt1_vs_pt2_trg9_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_trg9_cen","histo_pt1_vs_pt2_trg9_cen_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_trg9_fwd","histo_pt1_vs_pt2_trg9_fwd_unweighted",None,True,1.e6),
+
     (input,"histo_pt1_vs_pt2_kee","histo_pt1_vs_pt2_kee_unweighted",None,True,1.e6),
     (input,"histo_pt1_vs_pt2_acc","histo_pt1_vs_pt2_acc_unweighted",None,True,1.e6),
+
     (input,"histo_pt1_vs_pt2_gen","histo_pt1_vs_pt2_gen_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_sig","histo_pt1_vs_pt2_sig_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_rec","histo_pt1_vs_pt2_rec_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_cat","histo_pt1_vs_pt2_cat_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_pre","histo_pt1_vs_pt2_pre_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_bdt","histo_pt1_vs_pt2_bdt_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_lq2","histo_pt1_vs_pt2_lq2_unweighted",None,True,1.e6),
     (input,"histo_pt1_vs_pt2_gen_cen","histo_pt1_vs_pt2_gen_cen_unweighted",None,True,1.e6),
     (input,"histo_pt1_vs_pt2_gen_fwd","histo_pt1_vs_pt2_gen_fwd_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_lq2_cen","histo_pt1_vs_pt2_lq2_cen_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_lq2_fwd","histo_pt1_vs_pt2_lq2_fwd_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_gen9","histo_pt1_vs_pt2_gen9_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_gen9_cen","histo_pt1_vs_pt2_gen9_cen_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_gen9_fwd","histo_pt1_vs_pt2_gen9_fwd_unweighted",None,True,1.e6),
+
+    (input,"histo_pt1_vs_pt2_sig","histo_pt1_vs_pt2_sig_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_rec","histo_pt1_vs_pt2_rec_unweighted",None,True,1.e6),
+
+    (input,"histo_pt1_vs_pt2_cat","histo_pt1_vs_pt2_cat_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_cat_cen","histo_pt1_vs_pt2_cat_cen_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_cat_fwd","histo_pt1_vs_pt2_cat_fwd_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_cat9","histo_pt1_vs_pt2_cat9_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_cat9_cen","histo_pt1_vs_pt2_cat9_cen_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_cat9_fwd","histo_pt1_vs_pt2_cat9_fwd_unweighted",None,True,1.e6),
+
+    (input,"histo_pt1_vs_pt2_pre","histo_pt1_vs_pt2_pre_unweighted",None,True,1.e6),
+
+    (input,"histo_pt1_vs_pt2_bdt","histo_pt1_vs_pt2_bdt_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_bdt_cen","histo_pt1_vs_pt2_bdt_cen_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_bdt_fwd","histo_pt1_vs_pt2_bdt_fwd_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_bdt9","histo_pt1_vs_pt2_bdt9_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_bdt9_cen","histo_pt1_vs_pt2_bdt9_cen_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_bdt9_fwd","histo_pt1_vs_pt2_bdt9_fwd_unweighted",None,True,1.e6),
+
+    (input,"histo_pt1_vs_pt2_qsq","histo_pt1_vs_pt2_qsq_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_qsq_cen","histo_pt1_vs_pt2_qsq_cen_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_qsq_fwd","histo_pt1_vs_pt2_qsq_fwd_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_qsq9","histo_pt1_vs_pt2_qsq9_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_qsq9_cen","histo_pt1_vs_pt2_qsq9_cen_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_qsq9_fwd","histo_pt1_vs_pt2_qsq9_fwd_unweighted",None,True,1.e6),
+
     # numer, weighted
     (input,"histo_pt1_vs_pt2_inc","histo_pt1_vs_pt2_inc_weighted",histo_scale,True,1.e3),
+
     (input,"histo_pt1_vs_pt2_trg","histo_pt1_vs_pt2_trg_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_trg_cen","histo_pt1_vs_pt2_trg_cen_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_trg_fwd","histo_pt1_vs_pt2_trg_fwd_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_trg9","histo_pt1_vs_pt2_trg9_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_trg9_cen","histo_pt1_vs_pt2_trg9_cen_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_trg9_fwd","histo_pt1_vs_pt2_trg9_fwd_weighted",histo_scale,True,1.e3),
+
     (input,"histo_pt1_vs_pt2_kee","histo_pt1_vs_pt2_kee_weighted",histo_scale,True,1.e3),
     (input,"histo_pt1_vs_pt2_acc","histo_pt1_vs_pt2_acc_weighted",histo_scale,True,1.e3),
+
     (input,"histo_pt1_vs_pt2_gen","histo_pt1_vs_pt2_gen_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_sig","histo_pt1_vs_pt2_sig_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_rec","histo_pt1_vs_pt2_rec_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_cat","histo_pt1_vs_pt2_cat_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_pre","histo_pt1_vs_pt2_pre_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_bdt","histo_pt1_vs_pt2_bdt_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_lq2","histo_pt1_vs_pt2_lq2_weighted",histo_scale,True,1.e3),
     (input,"histo_pt1_vs_pt2_gen_cen","histo_pt1_vs_pt2_gen_cen_weighted",histo_scale,True,1.e3),
     (input,"histo_pt1_vs_pt2_gen_fwd","histo_pt1_vs_pt2_gen_fwd_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_lq2_cen","histo_pt1_vs_pt2_lq2_cen_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_lq2_fwd","histo_pt1_vs_pt2_lq2_fwd_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_gen9","histo_pt1_vs_pt2_gen9_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_gen9_cen","histo_pt1_vs_pt2_gen9_cen_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_gen9_fwd","histo_pt1_vs_pt2_gen9_fwd_weighted",histo_scale,True,1.e3),
+
+    (input,"histo_pt1_vs_pt2_sig","histo_pt1_vs_pt2_sig_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_rec","histo_pt1_vs_pt2_rec_weighted",histo_scale,True,1.e3),
+
+    (input,"histo_pt1_vs_pt2_cat","histo_pt1_vs_pt2_cat_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_cat_cen","histo_pt1_vs_pt2_cat_cen_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_cat_fwd","histo_pt1_vs_pt2_cat_fwd_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_cat9","histo_pt1_vs_pt2_cat9_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_cat9_cen","histo_pt1_vs_pt2_cat9_cen_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_cat9_fwd","histo_pt1_vs_pt2_cat9_fwd_weighted",histo_scale,True,1.e3),
+
+    (input,"histo_pt1_vs_pt2_pre","histo_pt1_vs_pt2_pre_weighted",histo_scale,True,1.e3),
+
+    (input,"histo_pt1_vs_pt2_bdt","histo_pt1_vs_pt2_bdt_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_bdt_cen","histo_pt1_vs_pt2_bdt_cen_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_bdt_fwd","histo_pt1_vs_pt2_bdt_fwd_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_bdt9","histo_pt1_vs_pt2_bdt9_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_bdt9_cen","histo_pt1_vs_pt2_bdt9_cen_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_bdt9_fwd","histo_pt1_vs_pt2_bdt9_fwd_weighted",histo_scale,True,1.e3),
+
+    (input,"histo_pt1_vs_pt2_qsq","histo_pt1_vs_pt2_qsq_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_qsq_cen","histo_pt1_vs_pt2_qsq_cen_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_qsq_fwd","histo_pt1_vs_pt2_qsq_fwd_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_qsq9","histo_pt1_vs_pt2_qsq9_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_qsq9_cen","histo_pt1_vs_pt2_qsq9_cen_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_qsq9_fwd","histo_pt1_vs_pt2_qsq9_fwd_weighted",histo_scale,True,1.e3),
     #
     #(input,"histo_pt1_vs_pt2_dr","histo_pt1_vs_pt2_dr_unweighted",None,True,1.e6),
     #(input,"histo_pt1_vs_pt2_dr","histo_pt1_vs_pt2_dr_weighted",histo_scale,True,3.e2),
@@ -121,20 +180,49 @@ inputs_transform = [
 inputs_eff = [
     # pt_vs_pt
     ("histo_pt1_vs_pt2_inc_weighted","histo_pt1_vs_pt2_inc_weighted","eff_pt1_vs_pt2_inc_weighted",1.),
+
     ("histo_pt1_vs_pt2_trg_weighted","histo_pt1_vs_pt2_inc_weighted","eff_pt1_vs_pt2_trg_weighted",1.),
+    ("histo_pt1_vs_pt2_trg_cen_weighted","histo_pt1_vs_pt2_inc_weighted","eff_pt1_vs_pt2_trg_cen_weighted",1.),
+    ("histo_pt1_vs_pt2_trg_fwd_weighted","histo_pt1_vs_pt2_inc_weighted","eff_pt1_vs_pt2_trg_fwd_weighted",1.),
+    ("histo_pt1_vs_pt2_trg9_weighted","histo_pt1_vs_pt2_inc_weighted","eff_pt1_vs_pt2_trg9_weighted",1.),
+    ("histo_pt1_vs_pt2_trg9_cen_weighted","histo_pt1_vs_pt2_inc_weighted","eff_pt1_vs_pt2_trg9_cen_weighted",1.),
+    ("histo_pt1_vs_pt2_trg9_fwd_weighted","histo_pt1_vs_pt2_inc_weighted","eff_pt1_vs_pt2_trg9_fwd_weighted",1.),
+
     ("histo_pt1_vs_pt2_kee_weighted","histo_pt1_vs_pt2_trg_weighted","eff_pt1_vs_pt2_kee_weighted",1.),
     ("histo_pt1_vs_pt2_acc_weighted","histo_pt1_vs_pt2_trg_weighted","eff_pt1_vs_pt2_acc_weighted",1.),
+
     ("histo_pt1_vs_pt2_gen_weighted","histo_pt1_vs_pt2_trg_weighted","eff_pt1_vs_pt2_gen_weighted",1.),
-    ("histo_pt1_vs_pt2_sig_weighted","histo_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_sig_weighted",1.),
-    ("histo_pt1_vs_pt2_rec_weighted","histo_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_rec_weighted",1.),
-    ("histo_pt1_vs_pt2_cat_weighted","histo_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_cat_weighted",1.),
-    ("histo_pt1_vs_pt2_pre_weighted","histo_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_pre_weighted",1.),
-    ("histo_pt1_vs_pt2_bdt_weighted","histo_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_bdt_weighted",1.),
-    ("histo_pt1_vs_pt2_lq2_weighted","histo_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_lq2_weighted",1.),
     ("histo_pt1_vs_pt2_gen_cen_weighted","histo_pt1_vs_pt2_trg_weighted","eff_pt1_vs_pt2_gen_cen_weighted",1.),
     ("histo_pt1_vs_pt2_gen_fwd_weighted","histo_pt1_vs_pt2_trg_weighted","eff_pt1_vs_pt2_gen_fwd_weighted",1.),
-    ("histo_pt1_vs_pt2_lq2_cen_weighted","histo_pt1_vs_pt2_gen_cen_weighted","eff_pt1_vs_pt2_lq2_cen_weighted",1.),
-    ("histo_pt1_vs_pt2_lq2_fwd_weighted","histo_pt1_vs_pt2_gen_fwd_weighted","eff_pt1_vs_pt2_lq2_fwd_weighted",1.),
+    ("histo_pt1_vs_pt2_gen9_weighted","histo_pt1_vs_pt2_trg9_weighted","eff_pt1_vs_pt2_gen9_weighted",1.),
+    ("histo_pt1_vs_pt2_gen9_cen_weighted","histo_pt1_vs_pt2_trg9_cen_weighted","eff_pt1_vs_pt2_gen9_cen_weighted",1.),
+    ("histo_pt1_vs_pt2_gen9_fwd_weighted","histo_pt1_vs_pt2_trg9_fwd_weighted","eff_pt1_vs_pt2_gen9_fwd_weighted",1.),
+
+    ("histo_pt1_vs_pt2_sig_weighted","histo_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_sig_weighted",1.),
+    ("histo_pt1_vs_pt2_rec_weighted","histo_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_rec_weighted",1.),
+
+    ("histo_pt1_vs_pt2_cat_weighted","histo_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_cat_weighted",1.),
+    ("histo_pt1_vs_pt2_cat_cen_weighted","histo_pt1_vs_pt2_gen_cen_weighted","eff_pt1_vs_pt2_cat_cen_weighted",1.),
+    ("histo_pt1_vs_pt2_cat_fwd_weighted","histo_pt1_vs_pt2_gen_fwd_weighted","eff_pt1_vs_pt2_cat_fwd_weighted",1.),
+    ("histo_pt1_vs_pt2_cat9_weighted","histo_pt1_vs_pt2_gen9_weighted","eff_pt1_vs_pt2_cat9_weighted",1.),
+    ("histo_pt1_vs_pt2_cat9_cen_weighted","histo_pt1_vs_pt2_gen9_cen_weighted","eff_pt1_vs_pt2_cat9_cen_weighted",1.),
+    ("histo_pt1_vs_pt2_cat9_fwd_weighted","histo_pt1_vs_pt2_gen9_fwd_weighted","eff_pt1_vs_pt2_cat9_fwd_weighted",1.),
+
+    ("histo_pt1_vs_pt2_pre_weighted","histo_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_pre_weighted",1.),
+
+    ("histo_pt1_vs_pt2_bdt_weighted","histo_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_bdt_weighted",1.),
+    ("histo_pt1_vs_pt2_bdt_cen_weighted","histo_pt1_vs_pt2_gen_cen_weighted","eff_pt1_vs_pt2_bdt_cen_weighted",1.),
+    ("histo_pt1_vs_pt2_bdt_fwd_weighted","histo_pt1_vs_pt2_gen_fwd_weighted","eff_pt1_vs_pt2_bdt_fwd_weighted",1.),
+    ("histo_pt1_vs_pt2_bdt9_weighted","histo_pt1_vs_pt2_gen9_weighted","eff_pt1_vs_pt2_bdt9_weighted",1.),
+    ("histo_pt1_vs_pt2_bdt9_cen_weighted","histo_pt1_vs_pt2_gen9_cen_weighted","eff_pt1_vs_pt2_bdt9_cen_weighted",1.),
+    ("histo_pt1_vs_pt2_bdt9_fwd_weighted","histo_pt1_vs_pt2_gen9_fwd_weighted","eff_pt1_vs_pt2_bdt9_fwd_weighted",1.),
+
+    ("histo_pt1_vs_pt2_qsq_weighted","histo_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_qsq_weighted",1.),
+    ("histo_pt1_vs_pt2_qsq_cen_weighted","histo_pt1_vs_pt2_gen_cen_weighted","eff_pt1_vs_pt2_qsq_cen_weighted",1.),
+    ("histo_pt1_vs_pt2_qsq_fwd_weighted","histo_pt1_vs_pt2_gen_fwd_weighted","eff_pt1_vs_pt2_qsq_fwd_weighted",1.),
+    ("histo_pt1_vs_pt2_qsq9_weighted","histo_pt1_vs_pt2_gen9_weighted","eff_pt1_vs_pt2_qsq9_weighted",1.),
+    ("histo_pt1_vs_pt2_qsq9_cen_weighted","histo_pt1_vs_pt2_gen9_cen_weighted","eff_pt1_vs_pt2_qsq9_cen_weighted",1.),
+    ("histo_pt1_vs_pt2_qsq9_fwd_weighted","histo_pt1_vs_pt2_gen9_fwd_weighted","eff_pt1_vs_pt2_qsq9_fwd_weighted",1.),
 
 #    # relative efficiencies                                                                
 #    ("denom_pt1_vs_pt2_trg_weighted","denom_pt1_vs_pt2_inc_weighted","rel_pt1_vs_pt2_trg_weighted",1.),
