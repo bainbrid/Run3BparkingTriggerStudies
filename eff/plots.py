@@ -22,7 +22,7 @@ outputs = {}
 # N = 7.0E5 * 100./41.6 = 1.69E6
 
 # Normalise to the number of entries in DAS
-events_processed = 4971934.
+events_processed = 3181200 # 2021Dec20 #4971934. # 2021Dec16
 events_in_DAS = 5690878.
 histo_scale = events_in_DAS/events_processed
 print("histo_scale:",histo_scale,"events_in_DAS:",events_in_DAS,"events_processed:",events_processed)
@@ -50,7 +50,13 @@ inputs_pt = [
     (input,"histo_pt1_vs_pt2_trg9_fwd","histo_pt1_vs_pt2_trg9_fwd_unweighted",None,True,1.e6),
 
     (input,"histo_pt1_vs_pt2_kee","histo_pt1_vs_pt2_kee_unweighted",None,True,1.e6),
+
     (input,"histo_pt1_vs_pt2_acc","histo_pt1_vs_pt2_acc_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_acc_cen","histo_pt1_vs_pt2_acc_cen_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_acc_fwd","histo_pt1_vs_pt2_acc_fwd_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_acc9","histo_pt1_vs_pt2_acc9_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_acc9_cen","histo_pt1_vs_pt2_acc9_cen_unweighted",None,True,1.e6),
+    (input,"histo_pt1_vs_pt2_acc9_fwd","histo_pt1_vs_pt2_acc9_fwd_unweighted",None,True,1.e6),
 
     (input,"histo_pt1_vs_pt2_gen","histo_pt1_vs_pt2_gen_unweighted",None,True,1.e6),
     (input,"histo_pt1_vs_pt2_gen_cen","histo_pt1_vs_pt2_gen_cen_unweighted",None,True,1.e6),
@@ -96,7 +102,13 @@ inputs_pt = [
     (input,"histo_pt1_vs_pt2_trg9_fwd","histo_pt1_vs_pt2_trg9_fwd_weighted",histo_scale,True,1.e3),
 
     (input,"histo_pt1_vs_pt2_kee","histo_pt1_vs_pt2_kee_weighted",histo_scale,True,1.e3),
+
     (input,"histo_pt1_vs_pt2_acc","histo_pt1_vs_pt2_acc_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_acc_cen","histo_pt1_vs_pt2_acc_cen_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_acc_fwd","histo_pt1_vs_pt2_acc_fwd_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_acc9","histo_pt1_vs_pt2_acc9_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_acc9_cen","histo_pt1_vs_pt2_acc9_cen_weighted",histo_scale,True,1.e3),
+    (input,"histo_pt1_vs_pt2_acc9_fwd","histo_pt1_vs_pt2_acc9_fwd_weighted",histo_scale,True,1.e3),
 
     (input,"histo_pt1_vs_pt2_gen","histo_pt1_vs_pt2_gen_weighted",histo_scale,True,1.e3),
     (input,"histo_pt1_vs_pt2_gen_cen","histo_pt1_vs_pt2_gen_cen_weighted",histo_scale,True,1.e3),
@@ -189,7 +201,13 @@ inputs_eff = [
     ("histo_pt1_vs_pt2_trg9_fwd_weighted","histo_pt1_vs_pt2_inc_weighted","eff_pt1_vs_pt2_trg9_fwd_weighted",1.),
 
     ("histo_pt1_vs_pt2_kee_weighted","histo_pt1_vs_pt2_trg_weighted","eff_pt1_vs_pt2_kee_weighted",1.),
+
     ("histo_pt1_vs_pt2_acc_weighted","histo_pt1_vs_pt2_trg_weighted","eff_pt1_vs_pt2_acc_weighted",1.),
+    ("histo_pt1_vs_pt2_acc_cen_weighted","histo_pt1_vs_pt2_trg_weighted","eff_pt1_vs_pt2_acc_cen_weighted",1.),
+    ("histo_pt1_vs_pt2_acc_fwd_weighted","histo_pt1_vs_pt2_trg_weighted","eff_pt1_vs_pt2_acc_fwd_weighted",1.),
+    ("histo_pt1_vs_pt2_acc9_weighted","histo_pt1_vs_pt2_trg9_weighted","eff_pt1_vs_pt2_acc9_weighted",1.),
+    ("histo_pt1_vs_pt2_acc9_cen_weighted","histo_pt1_vs_pt2_trg9_cen_weighted","eff_pt1_vs_pt2_acc9_cen_weighted",1.),
+    ("histo_pt1_vs_pt2_acc9_fwd_weighted","histo_pt1_vs_pt2_trg9_fwd_weighted","eff_pt1_vs_pt2_acc9_fwd_weighted",1.),
 
     ("histo_pt1_vs_pt2_gen_weighted","histo_pt1_vs_pt2_trg_weighted","eff_pt1_vs_pt2_gen_weighted",1.),
     ("histo_pt1_vs_pt2_gen_cen_weighted","histo_pt1_vs_pt2_trg_weighted","eff_pt1_vs_pt2_gen_cen_weighted",1.),
@@ -241,7 +259,7 @@ inputs_eff = [
 
 for numer,denom,title,zmax in inputs_eff:
     print("inputs_eff:",name)
-    outputs[title] = writeEff(output,outputs[numer],outputs[denom],title,zmax)
+    outputs[title] = writeEffCumu(output,outputs[numer],outputs[denom],title,zmax)
 
 ################################################################################
 # Outputs 
