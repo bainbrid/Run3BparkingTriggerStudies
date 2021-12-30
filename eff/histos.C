@@ -27,6 +27,7 @@ void histos() {
   TCut sel_trg_Mu7 = "HLT_Mu7_IP4>0";
   TCut sel_trg_Mu8 = "HLT_Mu8_IP3>0";
   TCut sel_trg_Mu9 = "HLT_Mu9_IP6>0";
+  //TCut sel_trg_Mu9 = "trg_muon_pt>7. && trg_muon_pt<11. && abs(trg_muon_eta)<2.1"; //@@ Replicate BParking proposal selection?
   TCut sel_trg_Mu12 = "HLT_Mu12_IP6>0";
   
   // Identify B->Kee decay
@@ -131,12 +132,38 @@ void histos() {
   Histos histo_pt1_vs_pt2_kee = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_kee",
 						     sel_tmp,sel_cen,sel_fwd,
 						     xbins,xmin,xmax,xbins,xmin,xmax);
-  
+
+  //////////
   // In GEN acc? (pT>0.5, |eta|<2.5)
   sel_tmp = sel_trg&&sel_kee&&sel_acc;
   Histos histo_pt1_vs_pt2_acc = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_acc",
 						     sel_tmp,sel_cen,sel_fwd,
 						     xbins,xmin,xmax,xbins,xmin,xmax);
+  // In GEN acc with "trigger soup" requirement (sel_trg_OR)
+  sel_tmp = sel_trg_OR&&sel_kee&&sel_acc;
+  Histos histo_pt1_vs_pt2_accOR = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_accOR",
+						       sel_tmp,sel_cen,sel_fwd,
+						       xbins,xmin,xmax,xbins,xmin,xmax);
+  // In GEN acc with Mu7_IP4 trigger requirement (sel_trg_Mu7)
+  sel_tmp = sel_trg_Mu7&&sel_kee&&sel_acc;
+  Histos histo_pt1_vs_pt2_acc7 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_acc7",
+						      sel_tmp,sel_cen,sel_fwd,
+						      xbins,xmin,xmax,xbins,xmin,xmax);
+  // In GEN acc with Mu8_IP3 trigger requirement (sel_trg_Mu8)
+  sel_tmp = sel_trg_Mu8&&sel_kee&&sel_acc;
+  Histos histo_pt1_vs_pt2_acc8 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_acc8",
+						      sel_tmp,sel_cen,sel_fwd,
+						      xbins,xmin,xmax,xbins,xmin,xmax);
+  // In GEN acc with Mu9_IP6 trigger requirement (sel_trg_Mu9)
+  sel_tmp = sel_trg_Mu9&&sel_kee&&sel_acc;
+  Histos histo_pt1_vs_pt2_acc9 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_acc9",
+						      sel_tmp,sel_cen,sel_fwd,
+						      xbins,xmin,xmax,xbins,xmin,xmax);
+  // In GEN acc with Mu12_IP6 trigger requirement (sel_trg_Mu12)
+  sel_tmp = sel_trg_Mu12&&sel_kee&&sel_acc;
+  Histos histo_pt1_vs_pt2_acc12 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_acc12",
+						       sel_tmp,sel_cen,sel_fwd,
+						       xbins,xmin,xmax,xbins,xmin,xmax);
 
   //////////
   // Additional GEN reqs (pT>2.0, |eta|<2.5)
@@ -147,28 +174,28 @@ void histos() {
   // Additional GEN reqs with "trigger soup" requirement (sel_trg_OR)
   sel_tmp = sel_trg_OR&&sel_kee&&sel_acc&&sel_gen;
   Histos histo_pt1_vs_pt2_genOR = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_genOR",
-							   sel_tmp,sel_cen,sel_fwd,
-							   xbins,xmin,xmax,xbins,xmin,xmax);
+						       sel_tmp,sel_cen,sel_fwd,
+						       xbins,xmin,xmax,xbins,xmin,xmax);
   // Additional GEN reqs with Mu7_IP4 trigger requirement (sel_trg_Mu7)
   sel_tmp = sel_trg_Mu7&&sel_kee&&sel_acc&&sel_gen;
   Histos histo_pt1_vs_pt2_gen7 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_gen7",
-							  sel_tmp,sel_cen,sel_fwd,
-							  xbins,xmin,xmax,xbins,xmin,xmax);
+						      sel_tmp,sel_cen,sel_fwd,
+						      xbins,xmin,xmax,xbins,xmin,xmax);
   // Additional GEN reqs with Mu8_IP3 trigger requirement (sel_trg_Mu8)
   sel_tmp = sel_trg_Mu8&&sel_kee&&sel_acc&&sel_gen;
   Histos histo_pt1_vs_pt2_gen8 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_gen8",
-							  sel_tmp,sel_cen,sel_fwd,
-							  xbins,xmin,xmax,xbins,xmin,xmax);
+						      sel_tmp,sel_cen,sel_fwd,
+						      xbins,xmin,xmax,xbins,xmin,xmax);
   // Additional GEN reqs with Mu9_IP6 trigger requirement (sel_trg_Mu9)
   sel_tmp = sel_trg_Mu9&&sel_kee&&sel_acc&&sel_gen;
   Histos histo_pt1_vs_pt2_gen9 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_gen9",
-							  sel_tmp,sel_cen,sel_fwd,
-							  xbins,xmin,xmax,xbins,xmin,xmax);
+						      sel_tmp,sel_cen,sel_fwd,
+						      xbins,xmin,xmax,xbins,xmin,xmax);
   // Additional GEN reqs with Mu12_IP6 trigger requirement (sel_trg_Mu12)
   sel_tmp = sel_trg_Mu12&&sel_kee&&sel_acc&&sel_gen;
   Histos histo_pt1_vs_pt2_gen12 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_gen12",
-							   sel_tmp,sel_cen,sel_fwd,
-							   xbins,xmin,xmax,xbins,xmin,xmax);
+						       sel_tmp,sel_cen,sel_fwd,
+						       xbins,xmin,xmax,xbins,xmin,xmax);
 
   // GEN-to-RECO matching
   sel_tmp = sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig;
@@ -390,6 +417,21 @@ void histos() {
   histo_pt1_vs_pt2_acc.sum_->Write();
   histo_pt1_vs_pt2_acc.cen_->Write();
   histo_pt1_vs_pt2_acc.fwd_->Write();
+  histo_pt1_vs_pt2_accOR.sum_->Write();
+  histo_pt1_vs_pt2_accOR.cen_->Write();
+  histo_pt1_vs_pt2_accOR.fwd_->Write();
+  histo_pt1_vs_pt2_acc7.sum_->Write();
+  histo_pt1_vs_pt2_acc7.cen_->Write();
+  histo_pt1_vs_pt2_acc7.fwd_->Write();
+  histo_pt1_vs_pt2_acc8.sum_->Write();
+  histo_pt1_vs_pt2_acc8.cen_->Write();
+  histo_pt1_vs_pt2_acc8.fwd_->Write();
+  histo_pt1_vs_pt2_acc9.sum_->Write();
+  histo_pt1_vs_pt2_acc9.cen_->Write();
+  histo_pt1_vs_pt2_acc9.fwd_->Write();
+  histo_pt1_vs_pt2_acc12.sum_->Write();
+  histo_pt1_vs_pt2_acc12.cen_->Write();
+  histo_pt1_vs_pt2_acc12.fwd_->Write();
 
   histo_pt1_vs_pt2_gen.sum_->Write();
   histo_pt1_vs_pt2_gen.cen_->Write();
