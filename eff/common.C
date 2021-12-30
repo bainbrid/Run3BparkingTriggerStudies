@@ -19,10 +19,8 @@ float xmax = nbins*width;
 TChain* input(int nfiles=1e6) {
   std::string path="/Users/bainbrid/Desktop/Trigger/";
   std::vector<std::string> files;
-  //files.push_back(path+"mc_BuToKee_temp.root");
-  //files.push_back(path+"mc_BuToKee_2021Dec16_temp.root"); // 1 file
-  //files.push_back(path+"mc_BuToKee_2021Dec01.root");
-  files.push_back(path+"mc_BuToKee_2021Dec16.root");
+  //files.push_back(path+"mc_BuToKee_2021Dec16.root"); // no nAOD pre-sel
+  files.push_back(path+"mc_BuToKee_2021Dec20.root"); // with nAOD pre-sel
   int cntr = 0;
   nfiles = std::min(int(files.size()),nfiles);
   TChain* tree = new TChain("tree");
