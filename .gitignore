@@ -1,2 +1,5 @@
 *.pyc
 *.root
+*.d
+*.so
+*.pcm
