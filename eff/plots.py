@@ -16,23 +16,25 @@ outputs = {}
 
 # Number of these MC signal events per integrated luminosity:
 # N = L_int * XS * f_b * BF(b->muX) * BF(b->Kee) 
-#   = 41.6E3 [\fb] * 4.68E8 [fb] * 0.4 * 0.2 * 4.5E-7
+#   = 41.6 [/fb] * 4.7E8 [pb] *1E3 [fb/pb] * 0.4 * 0.2 * 4.5E-7
 #   = 7.0E5
 # ... but let's normalise to 100/fb!
 # N = 7.0E5 * 100./41.6 = 1.69E6
 
 # Normalise to the number of entries in DAS
-events_processed = 3181200 # 2021Dec20 #4971934. # 2021Dec16
+events_processed_2021Dec16 = 4971934.
+events_processed_2021Dec20 = 3181200.
+events_processed = events_processed_2021Dec20
 events_in_DAS = 5690878.
 histo_scale = events_in_DAS/events_processed
 print("histo_scale:",histo_scale,"events_in_DAS:",events_in_DAS,"events_processed:",events_processed)
 
 # Account for GEN filter for MC signal sample = 0.0041, taken from:
 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_test/PPD-RunIIFall18GS-00034
-# N(pT>5,|eta|<2.5) = 1.69E6 * 0.0041 = 6929   <-- Normalise to this number!
+# N(pT>5,|eta|<2.5) = 1.69E6 * 0.0041 = 6929   <-- Normalise to 6900 (2 s.f.)!
  
 # "lumi_scale" normalises the number of events_in_DAS to that expected from L_int (after GEN filter)
-lumi_scale = 6929. / events_in_DAS
+lumi_scale = 6900. / events_in_DAS
 histo_scale *= lumi_scale
 
 ################################################################################
