@@ -5,6 +5,27 @@ import numpy as np
 from array import array
 from ROOT import TFile, TTree, Double, TLorentzVector
 from DataFormats.FWLite import Events, Handle
+from files_BuToKee_v3 import files_v3
+from files_inclusive import indices
+
+################################################################################
+#
+
+files_dict = {}
+
+# Exclusive samples, with tag-side muon selection (pT > 5 GeV, |eta| < 2.5)
+prefix='root://cms-xrd-global.cern.ch/'
+files_dict["incl"]=[ prefix+"{:s}".format(f) for f in files_v3 ][:1] # 1 file, ~25k events?
+
+files_dict["incl"]=['root://cms-xrd-global.cern.ch//store/mc/RunIIAutumn18MiniAOD/BuToKee_Mufilter_SoftQCDnonD_TuneCP5_13TeV-pythia8-evtgen/MINIAODSIM/Custom_RK_BParking_for_RK_102X_upgrade2018_realistic_v15-v2/110000/76EF89AB-1EFF-2C43-BF66-6CA048A2F7B5.root']
+
+# Fully inclusive w.r.t. tag-side muon
+path='/eos/cms/store/group/phys_bphys/trigger/BparkingTriggerStudy_nomufilter/AOD_BparkingTriggerStudy_nomufilter_'
+files_dict["incl"]=[ path+"{:.0f}.root".format(index) for index in indices ][:100] # 100 files, ~23.6k events?
+
+# Select here
+sample = "incl"
+files = files_dict[sample]
 
 ################################################################################
 #
@@ -84,7 +105,7 @@ class TreeProducerGen(TreeProducerCommon):
         self.addBranch('gen_b_phi','f')
         self.addBranch('ngenmuons','i')
         self.addBranch('ngenelectrons','i')
-        self.addBranch('trigger','i')
+        #self.addBranch('trigger','i')
 
     def finalDaughters(particle, daughters):
         '''Fills daughters with all the daughters of particle.
@@ -108,30 +129,7 @@ class TreeProducerGen(TreeProducerCommon):
 ################################################################################
 #
 
-#files=['file:./root/MINIAOD.root']
-path="root://cms-xrd-global.cern.ch//store/mc/RunIIAutumn18MiniAOD/BuToKee_MufilterPt6_SoftQCDnonD_TuneCP5_13TeV-pythia8-evtgen/MINIAODSIM/PUPoissonAve20_BParking_102X_upgrade2018_realistic_v15-v1/"
-files=[
-    path+'00000/01501E26-9276-7149-A74D-5E4B2E028DC8.root',
-#    path+"260000/00FD1710-09A4-9A45-B22B-6395B15DA05E.root",
-#    path+"260000/D368E158-9B9A-F645-A48E-772F29E729D8.root",
-#    path+"260000/B2A8EC54-1587-AD49-9C4F-C82C0648FADF.root",
-#    path+"260000/DEB8EE96-CB34-8C40-8C78-BF3F4DA3828E.root",
-#    path+"260000/0766236A-6FF9-5044-8FEB-2509F498CEF2.root",
-#    path+"260000/38630A2B-EC5A-2146-AB1C-C1C016A83537.root",
-#    path+"260000/72E77B37-BF53-D546-9A82-780AC8062350.root",
-#    path+"260000/86791084-34DA-BB4E-92E3-39FB45FDBA97.root",
-#    path+"260000/5E4DAFD3-D90F-5C4C-B6FC-2ED49E997014.root",
-#    path+"260000/F326012E-A5EA-E549-8A03-BA0867C1BD7F.root",
-#    path+"260000/4FBA2D0E-481B-854A-91DD-FD75DE6C4802.root",
-#    path+"260000/247806D2-A976-6B40-BB72-6D3A23B47DFC.root",
-#    path+"130000/2FF74584-E028-B042-8B14-0C1D4C46389B.root",
-#    path+"280000/C66696E9-DC61-6146-AEED-69B4BE9A10FE.root",
-#    path+"280000/25CEE19C-3881-7C4D-9BA2-6C5286DFE3F4.root",
-#    path+"280000/129D7AB9-CC04-014B-AB77-074A395337F3.root",
-#    path+"280000/1253B701-1703-EB4F-9DCF-DB31A2DF4BD2.root",
-#    path+"280000/1855AB46-1FB8-BD49-997D-3D5879C58106.root",
-#    path+"280000/522A856A-77BA-8941-9102-236E6B02E52F.root",
-    ]
+print(files)
 print 'Processing {:.0f} files...'.format(len(files))
 
 events = Events(files)
@@ -139,34 +137,34 @@ nevent = int(events.size())
 print 'Number of files processed: {:.0f}, total number of events processed: {:.0f}'.format(len(files),nevent)
 
 handle = Handle('std::vector<reco::GenParticle>')
-label = ("prunedGenParticles")
-out = TreeProducerGen('root/genstudy_pt.root')
+label = ("prunedGenParticles") if sample=="excl" else ("genParticles") if sample=="incl" else None
+out = TreeProducerGen('ntuple.root')
 
-# Trigger collections
-triggerBits, triggerBitLabel = Handle("edm::TriggerResults"), ("TriggerResults","","HLT")
-triggerObjects, triggerObjectLabel  = Handle("std::vector<pat::TriggerObjectStandAlone>"), "slimmedPatTrigger"
-triggerPrescales, triggerPrescaleLabel  = Handle("pat::PackedTriggerPrescales"), "patTrigger"
-
-# Trigger info
-hlt_paths=[
-    "HLT_Mu7_IP4",
-    "HLT_Mu8_IP6",
-    "HLT_Mu8_IP5",
-    "HLT_Mu8_IP3",
-    "HLT_Mu8p5_IP3p5",
-    "HLT_Mu9_IP6",
-    "HLT_Mu9_IP5",
-    "HLT_Mu9_IP4",
-    "HLT_Mu10p5_IP3p5",
-    "HLT_Mu12_IP6"
-    ]
-
-# Add branches
-hlt_paths = list(set(hlt_paths))
-out.addBranches(hlt_paths)
-
-trigger_indices=None
-trigger_debug=0
+## Trigger collections
+#triggerBits, triggerBitLabel = Handle("edm::TriggerResults"), ("TriggerResults","","HLT")
+#triggerObjects, triggerObjectLabel  = Handle("std::vector<pat::TriggerObjectStandAlone>"), "slimmedPatTrigger"
+#triggerPrescales, triggerPrescaleLabel  = Handle("pat::PackedTriggerPrescales"), "patTrigger"
+#
+## Trigger info
+#hlt_paths=[
+#    "HLT_Mu7_IP4",
+#    "HLT_Mu8_IP6",
+#    "HLT_Mu8_IP5",
+#    "HLT_Mu8_IP3",
+#    "HLT_Mu8p5_IP3p5",
+#    "HLT_Mu9_IP6",
+#    "HLT_Mu9_IP5",
+#    "HLT_Mu9_IP4",
+#    "HLT_Mu10p5_IP3p5",
+#    "HLT_Mu12_IP6"
+#    ]
+#
+## Add branches
+#hlt_paths = list(set(hlt_paths))
+#out.addBranches(hlt_paths)
+#
+#trigger_indices=None
+#trigger_debug=0
 
 print "Starting event loop..."
 
@@ -174,87 +172,87 @@ nanalyzed = 0
 ndropped = 0
 for ievent,ev in enumerate(events):
     #if ievent > 1000 : break
-    if ievent%1000==0: print('{0:.1f}% processed'.format(Double(ievent)/Double(nevent)*100.))
+    if ievent%100==0: print('{0:.1f}% processed'.format(Double(ievent)/Double(nevent)*100.))
     #print('{0:.0f} processed'.format(Double(ievent)))
 
-    # Get trigger collections
-    ev.getByLabel(triggerBitLabel, triggerBits)
-    ev.getByLabel(triggerObjectLabel, triggerObjects)
-    ev.getByLabel(triggerPrescaleLabel, triggerPrescales)
-
-    # Identify trigger indices (Assumes they don't change? So let's check every N events!)
-    if ievent%100000==0 or trigger_indices==None:
-        print "determine trigger indices..."
-        path_indices = []
-        trigger_indices = []
-        names = ev.object().triggerNames(triggerBits.product())
-        for iname in xrange(triggerBits.product().size()):
-            for ipath,path in enumerate(hlt_paths):
-                if path in names.triggerName(iname):
-                    trigger_indices.append(iname)
-                    path_indices.append(ipath)
-        trigger_indices = list(set(trigger_indices))
-        print "trigger_indices",trigger_indices
-        print "path_indices",path_indices
-        print "hlt_paths",hlt_paths
-
-    # Check if BParking trigger path fired
-    triggered_ = []
-    triggered = False
-    for idx,index in enumerate(trigger_indices):
-        if triggerBits.product().accept(index):
-            triggered = True
-            triggered_.append(hlt_paths[path_indices[idx]])
-            if trigger_debug>0:
-                prescale = triggerPrescales.product().getPrescaleForIndex(index)
-                print "BParking trigger FIRED with path",\
-                    "{:s} and index {:.0f} and prescale {:.0f} in event {:.0f}!".format(names.triggerName(index),
-                                                                                        index,
-                                                                                        prescale,
-                                                                                        ievent)
-
-    if trigger_debug>1 and triggered:
-        print "\n === BPARKING PATHS ==="
-        names = ev.object().triggerNames(triggerBits.product())
-        for index in xrange(triggerBits.product().size()):
-            for path in hlt_paths:
-                if path in names.triggerName(index) and triggerBits.product().accept(index):
-                    print "BParking trigger ",\
-                        names.triggerName(index),\
-                        ", index ",\
-                        index,\
-                        ", prescale ",\
-                        triggerPrescales.product().getPrescaleForIndex(index), ": ",\
-                        ("PASS" if triggerBits.product().accept(index) else "fail (or not run)") 
-
-    # Some trigger debug
-    if trigger_debug>2 :
-        # Print trigger debug info
-        print "\nEvent %d: run %6d, lumi %4d, event %12d" % (ievent,ev.eventAuxiliary().run(),
-                                                             ev.eventAuxiliary().luminosityBlock(),
-                                                             ev.eventAuxiliary().event())
-        print "\n === TRIGGER PATHS ==="
-        names = ev.object().triggerNames(triggerBits.product())
-        for i in xrange(triggerBits.product().size()):
-            print "Trigger ",\
-                names.triggerName(i),\
-                ", index ",\
-                i,\
-                ", prescale ",\
-                triggerPrescales.product().getPrescaleForIndex(i), ": ",\
-                ("PASS" if triggerBits.product().accept(i) else "fail (or not run)") 
-
-    if trigger_debug>3 :
-        print "\n === TRIGGER OBJECTS ==="
-        for j,to in enumerate(triggerObjects.product()):
-            to.unpackPathNames(names)
-            to.unpackFilterLabels(ev.object(),triggerBits.product())
-            print "Trigger object pt %6.2f eta %+5.3f phi %+5.3f  " % (to.pt(),to.eta(),to.phi())
-            print "   collection: ", to.collection()
-            print "   type ids: ", ", ".join([str(f) for f in to.filterIds()])
-            print "   filters: ", ", ".join([str(f) for f in to.filterLabels()])
-            pathslast = set(to.pathNames(True))
-            print "   paths:   ", ", ".join([("%s*" if f in pathslast else "%s")%f for f in to.pathNames()]) 
+#    # Get trigger collections
+#    ev.getByLabel(triggerBitLabel, triggerBits)
+#    ev.getByLabel(triggerObjectLabel, triggerObjects)
+#    ev.getByLabel(triggerPrescaleLabel, triggerPrescales)
+#
+#    # Identify trigger indices (Assumes they don't change? So let's check every N events!)
+#    if ievent%100000==0 or trigger_indices==None:
+#        print "determine trigger indices..."
+#        path_indices = []
+#        trigger_indices = []
+#        names = ev.object().triggerNames(triggerBits.product())
+#        for iname in xrange(triggerBits.product().size()):
+#            for ipath,path in enumerate(hlt_paths):
+#                if path in names.triggerName(iname):
+#                    trigger_indices.append(iname)
+#                    path_indices.append(ipath)
+#        trigger_indices = list(set(trigger_indices))
+#        print "trigger_indices",trigger_indices
+#        print "path_indices",path_indices
+#        print "hlt_paths",hlt_paths
+#
+#    # Check if BParking trigger path fired
+#    triggered_ = []
+#    triggered = False
+#    for idx,index in enumerate(trigger_indices):
+#        if triggerBits.product().accept(index):
+#            triggered = True
+#            triggered_.append(hlt_paths[path_indices[idx]])
+#            if trigger_debug>0:
+#                prescale = triggerPrescales.product().getPrescaleForIndex(index)
+#                print "BParking trigger FIRED with path",\
+#                    "{:s} and index {:.0f} and prescale {:.0f} in event {:.0f}!".format(names.triggerName(index),
+#                                                                                        index,
+#                                                                                        prescale,
+#                                                                                        ievent)
+#
+#    if trigger_debug>1 and triggered:
+#        print "\n === BPARKING PATHS ==="
+#        names = ev.object().triggerNames(triggerBits.product())
+#        for index in xrange(triggerBits.product().size()):
+#            for path in hlt_paths:
+#                if path in names.triggerName(index) and triggerBits.product().accept(index):
+#                    print "BParking trigger ",\
+#                        names.triggerName(index),\
+#                        ", index ",\
+#                        index,\
+#                        ", prescale ",\
+#                        triggerPrescales.product().getPrescaleForIndex(index), ": ",\
+#                        ("PASS" if triggerBits.product().accept(index) else "fail (or not run)") 
+#
+#    # Some trigger debug
+#    if trigger_debug>2 :
+#        # Print trigger debug info
+#        print "\nEvent %d: run %6d, lumi %4d, event %12d" % (ievent,ev.eventAuxiliary().run(),
+#                                                             ev.eventAuxiliary().luminosityBlock(),
+#                                                             ev.eventAuxiliary().event())
+#        print "\n === TRIGGER PATHS ==="
+#        names = ev.object().triggerNames(triggerBits.product())
+#        for i in xrange(triggerBits.product().size()):
+#            print "Trigger ",\
+#                names.triggerName(i),\
+#                ", index ",\
+#                i,\
+#                ", prescale ",\
+#                triggerPrescales.product().getPrescaleForIndex(i), ": ",\
+#                ("PASS" if triggerBits.product().accept(i) else "fail (or not run)") 
+#
+#    if trigger_debug>3 :
+#        print "\n === TRIGGER OBJECTS ==="
+#        for j,to in enumerate(triggerObjects.product()):
+#            to.unpackPathNames(names)
+#            to.unpackFilterLabels(ev.object(),triggerBits.product())
+#            print "Trigger object pt %6.2f eta %+5.3f phi %+5.3f  " % (to.pt(),to.eta(),to.phi())
+#            print "   collection: ", to.collection()
+#            print "   type ids: ", ", ".join([str(f) for f in to.filterIds()])
+#            print "   filters: ", ", ".join([str(f) for f in to.filterLabels()])
+#            pathslast = set(to.pathNames(True))
+#            print "   paths:   ", ", ".join([("%s*" if f in pathslast else "%s")%f for f in to.pathNames()]) 
 
     # Get GEN info
     ev.getByLabel(label, handle)
@@ -301,13 +299,13 @@ for ievent,ev in enumerate(events):
     out.ngenmuons[0] = len(genmuons)
     out.ngenelectrons[0] = len(genelectrons)
 
-    triggered_ = list(set(triggered_))
-    out.trigger[0] = triggered
-    for path in hlt_paths:
-        attr = getattr(out,path,None)
-        if attr is not None:
-            if path in triggered_: attr[0] = 1
-            if path not in triggered_: attr[0] = 0
+#    triggered_ = list(set(triggered_))
+#    out.trigger[0] = triggered
+#    for path in hlt_paths:
+#        attr = getattr(out,path,None)
+#        if attr is not None:
+#            if path in triggered_: attr[0] = 1
+#            if path not in triggered_: attr[0] = 0
 
     out.tree.Fill()
     nanalyzed += 1
