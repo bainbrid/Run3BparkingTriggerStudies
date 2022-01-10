@@ -88,51 +88,57 @@ def cumuHisto(histo,xcumu=None,ycumu=None,diag=False):
 
 ################################################################################
 # 
-def drawHisto(histo,eff=False,logy=True,zmax=None):
+def drawHisto(histo,eff=False,logy=True,zmin=None,zmax=None,cumu=False):
     canvas = TCanvas()
     canvas.cd()
     histo.Draw("TEXT COLZ")
     histo.SetStats(0)
-    histo.GetXaxis().SetTitle("Sub-leading electron p_{T}^{gen} [GeV]")
-    histo.GetXaxis().SetTitleOffset(1.3)
-    histo.GetYaxis().SetTitle("Leading electron p_{T}^{gen} [GeV]")
+    if cumu : histo.GetXaxis().SetTitle("Sub-leading electron p_{T}^{gen} threshold [GeV]")
+    else : histo.GetXaxis().SetTitle("Sub-leading electron p_{T}^{gen} [GeV]")
+    if cumu : histo.GetYaxis().SetTitle("Leading electron p_{T}^{gen} threshold [GeV]")
+    else : histo.GetYaxis().SetTitle("Leading electron p_{T}^{gen} [GeV]")
+    histo.GetXaxis().SetTitleSize(0.04)
+    histo.GetYaxis().SetTitleSize(0.04)
+    histo.GetXaxis().SetTitleOffset(1.05)
     # Title
     histo.SetTitle("")
     text = TLatex()
     text.SetNDC()
     text.SetTextSize(0.04)
     text.DrawLatex(0.10,0.92,"#scale[1.2]{CMS} #it{Simulation (Internal)}")
-    text.DrawLatex(0.55,0.92,"#scale[1.2]{L_{int} = 100 fb^{-1}, #sqrt{s} = 13 TeV}")
+    text.DrawLatex(0.55,0.92,"#scale[1.2]{L_{int} = 41.6 fb^{-1}, #sqrt{s} = 13 TeV}")
     if eff: 
         gStyle.SetPaintTextFormat("5.3f");
         histo.SetMinimum(1.e-4)
+        histo.SetMaximum(1.)
+        if zmin is not None and logy is False : histo.SetMinimum(zmin)
         if zmax is not None : histo.SetMaximum(zmax)
-        else : histo.SetMaximum(1.)
         histo.SetMarkerSize(1.6)
     else: 
         gStyle.SetPaintTextFormat(".1f");
         histo.SetMinimum(0.1)
+        if zmin is not None and logy is False : histo.SetMinimum(zmin)
         if zmax is not None : histo.SetMaximum(zmax)
         histo.SetMarkerSize(1.)
         # Labels
         text.SetTextSize(0.03)
         text.DrawLatex(0.7,0.25,"Entries: {:.1f}".format(histo.GetEntries())) 
-        text.DrawLatex(0.7,0.2,"Integral: {:.1f}".format(histo.Integral())) 
+        if not cumu : text.DrawLatex(0.7,0.2,"Integral: {:.1f}".format(histo.Integral())) 
     if logy : canvas.SetLogz()
     return canvas
 
 ################################################################################
 # 
-def writeHisto(output,input,name,title,scale=None,logy=True,zmax=None,xcumu=None,ycumu=None):
+def writeHisto(output,input,name,title,scale=None,logy=True,zmin=None,zmax=None,xcumu=None,ycumu=None):
     histo = getHisto(input,name,title)
     if scale != None : histo.Scale(scale)
-    canvas = drawHisto(histo,False,logy,zmax)
+    canvas = drawHisto(histo,False,logy,zmin,zmax)
     canvas.SaveAs("latest/{:s}.pdf".format(title)) 
     output.cd()
     histo.Write()
     if xcumu != None or ycumu != None :
-        cumu = cumuHisto(histo,xcumu=xcumu,ycumu=ycumu)
-        canvas = drawHisto(cumu,False,logy,zmax)
+        cumu = cumuHisto(histo,xcumu=xcumu,ycumu=ycumu,diag=True)
+        canvas = drawHisto(cumu,False,logy,zmin,zmax,cumu=True)
         canvas.SaveAs("latest/{:s}_cumu.pdf".format(title)) 
         output.cd()
         cumu.Write()
@@ -141,7 +147,7 @@ def writeHisto(output,input,name,title,scale=None,logy=True,zmax=None,xcumu=None
 
 ################################################################################
 # 
-def writeEff(output,numer,denom,title,zmax=None,cumu=False):
+def writeEff(output,numer,denom,title,zmin=None,zmax=None,cumu=False):
     if cumu :
         numer = cumuHisto(numer,xcumu="gt",ycumu="gt",diag=True)
         denom = cumuHisto(denom,xcumu="gt",ycumu="gt",diag=True)
@@ -159,9 +165,9 @@ def writeEff(output,numer,denom,title,zmax=None,cumu=False):
     print("eff val      :",eff.GetBinContent(eff.GetXaxis().GetNbins(),
                                              eff.GetYaxis().GetNbins()))
     suffix = "_cumu" if cumu else ""
-    canvas = drawHisto(eff,True,False,zmax)
+    canvas = drawHisto(eff,True,False,zmin,zmax)
     canvas.SaveAs("latest/{:s}{:s}.pdf".format(title,suffix)) 
-    canvas = drawHisto(eff,True,True,zmax)
+    canvas = drawHisto(eff,True,True,zmin,zmax)
     canvas.SaveAs("latest/{:s}{:s}_log.pdf".format(title,suffix)) 
     output.cd()
     eff.Write()
@@ -169,9 +175,9 @@ def writeEff(output,numer,denom,title,zmax=None,cumu=False):
 
 ################################################################################
 # 
-def writeEffCumu(output,numer,denom,title,zmax=None):
-    writeEff(output,numer,denom,title,zmax,True)
-    return writeEff(output,numer,denom,title,zmax,False) # return NON-cumu plot!
+def writeEffCumu(output,numer,denom,title,zmin=None,zmax=None):
+    writeEff(output,numer,denom,title,zmin,zmax,True)
+    return writeEff(output,numer,denom,title,zmin,zmax,False) # return NON-cumu plot!
 
 ################################################################################
 # 
