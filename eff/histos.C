@@ -21,6 +21,9 @@ void histos() {
   ////////////////////////////////////////////////////////////////////////////////
   // Cuts
 
+  // Inclusive requirement
+  TCut sel_inc = "";
+
   // Trigger requirement
   TCut sel_trg  = "trg_muon_pt>-1.";
   TCut sel_trg_OR = "trg_muon_pt>0.";
@@ -71,7 +74,7 @@ void histos() {
   
   // List selections
   std::cout << "selections:" << std::endl
-	    << "  sel_inc: " << sel_trg.GetTitle() << std::endl
+	    << "  sel_inc: " << sel_inc.GetTitle() << std::endl
 	    << "  sel_trg: " << sel_trg.GetTitle() << std::endl
 	    << "  sel_kee: " << sel_kee.GetTitle() << std::endl
 	    << "  sel_acc: " << sel_acc.GetTitle() << std::endl
@@ -90,223 +93,223 @@ void histos() {
   // Histos 2D (GEN e1 pT vs GEN e2 pT) after various selections for sum,cen,fwd
 
   // Inclusive 
-  TCut sel_tmp = "";
+  TCut sel_tmp = sel_inc;
   Histos histo_pt1_vs_pt2_inc = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_inc",
 						     sel_tmp,sel_cen,sel_fwd,
 						     xbins,xmin,xmax,xbins,xmin,xmax);
   
   //////////
   // No trigger (trg_muon_pt>-1.)
-  sel_tmp = sel_trg;
+  sel_tmp = sel_inc&&sel_trg;
   Histos histo_pt1_vs_pt2_trg = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_trg",
 						     sel_tmp,sel_cen,sel_fwd,
 						     xbins,xmin,xmax,xbins,xmin,xmax);
   // "trigger soup" requirement (sel_trg_OR)
-  sel_tmp = sel_trg_OR;
+  sel_tmp = sel_inc&&sel_trg_OR;
   Histos histo_pt1_vs_pt2_trgOR = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_trgOR",
 						       sel_tmp,sel_cen,sel_fwd,
 						       xbins,xmin,xmax,xbins,xmin,xmax);
   // Mu7_IP4 trigger requirement (sel_trg_Mu7)
-  sel_tmp = sel_trg_Mu7;
+  sel_tmp = sel_inc&&sel_trg_Mu7;
   Histos histo_pt1_vs_pt2_trg7 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_trg7",
 						      sel_tmp,sel_cen,sel_fwd,
 						      xbins,xmin,xmax,xbins,xmin,xmax);
   // Mu8_IP3 trigger requirement (sel_trg_Mu8)
-  sel_tmp = sel_trg_Mu8;
+  sel_tmp = sel_inc&&sel_trg_Mu8;
   Histos histo_pt1_vs_pt2_trg8 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_trg8",
 						      sel_tmp,sel_cen,sel_fwd,
 						      xbins,xmin,xmax,xbins,xmin,xmax);
   // Mu9_IP6 trigger requirement (sel_trg_Mu9)
-  sel_tmp = sel_trg_Mu9;
+  sel_tmp = sel_inc&&sel_trg_Mu9;
   Histos histo_pt1_vs_pt2_trg9 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_trg9",
 						      sel_tmp,sel_cen,sel_fwd,
 						      xbins,xmin,xmax,xbins,xmin,xmax);
   // Mu12_IP6 trigger requirement (sel_trg_Mu12)
-  sel_tmp = sel_trg_Mu12;
+  sel_tmp = sel_inc&&sel_trg_Mu12;
   Histos histo_pt1_vs_pt2_trg12 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_trg12",
 						       sel_tmp,sel_cen,sel_fwd,
 						       xbins,xmin,xmax,xbins,xmin,xmax);
   
   // Find B->Kee decay?
-  sel_tmp = sel_trg&&sel_kee;
+  sel_tmp = sel_inc&&sel_trg&&sel_kee;
   Histos histo_pt1_vs_pt2_kee = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_kee",
 						     sel_tmp,sel_cen,sel_fwd,
 						     xbins,xmin,xmax,xbins,xmin,xmax);
 
   //////////
   // In GEN acc? (pT>0.5, |eta|<2.5)
-  sel_tmp = sel_trg&&sel_kee&&sel_acc;
+  sel_tmp = sel_inc&&sel_trg&&sel_kee&&sel_acc;
   Histos histo_pt1_vs_pt2_acc = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_acc",
 						     sel_tmp,sel_cen,sel_fwd,
 						     xbins,xmin,xmax,xbins,xmin,xmax);
   // In GEN acc with "trigger soup" requirement (sel_trg_OR)
-  sel_tmp = sel_trg_OR&&sel_kee&&sel_acc;
+  sel_tmp = sel_inc&&sel_trg_OR&&sel_kee&&sel_acc;
   Histos histo_pt1_vs_pt2_accOR = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_accOR",
 						       sel_tmp,sel_cen,sel_fwd,
 						       xbins,xmin,xmax,xbins,xmin,xmax);
   // In GEN acc with Mu7_IP4 trigger requirement (sel_trg_Mu7)
-  sel_tmp = sel_trg_Mu7&&sel_kee&&sel_acc;
+  sel_tmp = sel_inc&&sel_trg_Mu7&&sel_kee&&sel_acc;
   Histos histo_pt1_vs_pt2_acc7 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_acc7",
 						      sel_tmp,sel_cen,sel_fwd,
 						      xbins,xmin,xmax,xbins,xmin,xmax);
   // In GEN acc with Mu8_IP3 trigger requirement (sel_trg_Mu8)
-  sel_tmp = sel_trg_Mu8&&sel_kee&&sel_acc;
+  sel_tmp = sel_inc&&sel_trg_Mu8&&sel_kee&&sel_acc;
   Histos histo_pt1_vs_pt2_acc8 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_acc8",
 						      sel_tmp,sel_cen,sel_fwd,
 						      xbins,xmin,xmax,xbins,xmin,xmax);
   // In GEN acc with Mu9_IP6 trigger requirement (sel_trg_Mu9)
-  sel_tmp = sel_trg_Mu9&&sel_kee&&sel_acc;
+  sel_tmp = sel_inc&&sel_trg_Mu9&&sel_kee&&sel_acc;
   Histos histo_pt1_vs_pt2_acc9 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_acc9",
 						      sel_tmp,sel_cen,sel_fwd,
 						      xbins,xmin,xmax,xbins,xmin,xmax);
   // In GEN acc with Mu12_IP6 trigger requirement (sel_trg_Mu12)
-  sel_tmp = sel_trg_Mu12&&sel_kee&&sel_acc;
+  sel_tmp = sel_inc&&sel_trg_Mu12&&sel_kee&&sel_acc;
   Histos histo_pt1_vs_pt2_acc12 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_acc12",
 						       sel_tmp,sel_cen,sel_fwd,
 						       xbins,xmin,xmax,xbins,xmin,xmax);
 
   //////////
   // Additional GEN reqs (pT>2.0, |eta|<2.5)
-  sel_tmp = sel_trg&&sel_kee&&sel_acc&&sel_gen;
+  sel_tmp = sel_inc&&sel_trg&&sel_kee&&sel_acc&&sel_gen;
   Histos histo_pt1_vs_pt2_gen = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_gen",
 						     sel_tmp,sel_cen,sel_fwd,
 						     xbins,xmin,xmax,xbins,xmin,xmax);
   // Additional GEN reqs with "trigger soup" requirement (sel_trg_OR)
-  sel_tmp = sel_trg_OR&&sel_kee&&sel_acc&&sel_gen;
+  sel_tmp = sel_inc&&sel_trg_OR&&sel_kee&&sel_acc&&sel_gen;
   Histos histo_pt1_vs_pt2_genOR = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_genOR",
 						       sel_tmp,sel_cen,sel_fwd,
 						       xbins,xmin,xmax,xbins,xmin,xmax);
   // Additional GEN reqs with Mu7_IP4 trigger requirement (sel_trg_Mu7)
-  sel_tmp = sel_trg_Mu7&&sel_kee&&sel_acc&&sel_gen;
+  sel_tmp = sel_inc&&sel_trg_Mu7&&sel_kee&&sel_acc&&sel_gen;
   Histos histo_pt1_vs_pt2_gen7 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_gen7",
 						      sel_tmp,sel_cen,sel_fwd,
 						      xbins,xmin,xmax,xbins,xmin,xmax);
   // Additional GEN reqs with Mu8_IP3 trigger requirement (sel_trg_Mu8)
-  sel_tmp = sel_trg_Mu8&&sel_kee&&sel_acc&&sel_gen;
+  sel_tmp = sel_inc&&sel_trg_Mu8&&sel_kee&&sel_acc&&sel_gen;
   Histos histo_pt1_vs_pt2_gen8 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_gen8",
 						      sel_tmp,sel_cen,sel_fwd,
 						      xbins,xmin,xmax,xbins,xmin,xmax);
   // Additional GEN reqs with Mu9_IP6 trigger requirement (sel_trg_Mu9)
-  sel_tmp = sel_trg_Mu9&&sel_kee&&sel_acc&&sel_gen;
+  sel_tmp = sel_inc&&sel_trg_Mu9&&sel_kee&&sel_acc&&sel_gen;
   Histos histo_pt1_vs_pt2_gen9 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_gen9",
 						      sel_tmp,sel_cen,sel_fwd,
 						      xbins,xmin,xmax,xbins,xmin,xmax);
   // Additional GEN reqs with Mu12_IP6 trigger requirement (sel_trg_Mu12)
-  sel_tmp = sel_trg_Mu12&&sel_kee&&sel_acc&&sel_gen;
+  sel_tmp = sel_inc&&sel_trg_Mu12&&sel_kee&&sel_acc&&sel_gen;
   Histos histo_pt1_vs_pt2_gen12 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_gen12",
 						       sel_tmp,sel_cen,sel_fwd,
 						       xbins,xmin,xmax,xbins,xmin,xmax);
 
   // GEN-to-RECO matching
-  sel_tmp = sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig;
+  sel_tmp = sel_inc&&sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig;
   Histos histo_pt1_vs_pt2_sig = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_sig",
 						     sel_tmp,sel_cen,sel_fwd,
 						     xbins,xmin,xmax,xbins,xmin,xmax);
 
   // RECO reqs (pT>2.0, |eta|<2.5)
-  sel_tmp = sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec;
+  sel_tmp = sel_inc&&sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec;
   Histos histo_pt1_vs_pt2_rec = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_rec",
 						     sel_tmp,sel_cen,sel_fwd,
 						     xbins,xmin,xmax,xbins,xmin,xmax);
 
   //////////
   // Category (PFPF)
-  sel_tmp = sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat;
+  sel_tmp = sel_inc&&sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat;
   Histos histo_pt1_vs_pt2_cat = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_cat",
 						     sel_tmp,sel_cen,sel_fwd,
 						     xbins,xmin,xmax,xbins,xmin,xmax);
   // Category with "trigger soup" requirement (sel_trg_OR)
-  sel_tmp = sel_trg_OR&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat;
+  sel_tmp = sel_inc&&sel_trg_OR&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat;
   Histos histo_pt1_vs_pt2_catOR = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_catOR",
 						       sel_tmp,sel_cen,sel_fwd,
 						       xbins,xmin,xmax,xbins,xmin,xmax);
   // Category with Mu7_IP4 trigger requirement (sel_trg_Mu7)
-  sel_tmp = sel_trg_Mu7&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat;
+  sel_tmp = sel_inc&&sel_trg_Mu7&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat;
   Histos histo_pt1_vs_pt2_cat7 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_cat7",
 						      sel_tmp,sel_cen,sel_fwd,
 						      xbins,xmin,xmax,xbins,xmin,xmax);
   // Category with Mu8_IP3 trigger requirement (sel_trg_Mu8)
-  sel_tmp = sel_trg_Mu8&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat;
+  sel_tmp = sel_inc&&sel_trg_Mu8&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat;
   Histos histo_pt1_vs_pt2_cat8 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_cat8",
 						      sel_tmp,sel_cen,sel_fwd,
 						      xbins,xmin,xmax,xbins,xmin,xmax);
   // Category with Mu9_IP6 trigger requirement (sel_trg_Mu9)
-  sel_tmp = sel_trg_Mu9&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat;
+  sel_tmp = sel_inc&&sel_trg_Mu9&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat;
   Histos histo_pt1_vs_pt2_cat9 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_cat9",
 						      sel_tmp,sel_cen,sel_fwd,
 						      xbins,xmin,xmax,xbins,xmin,xmax);
   // Category with Mu12_IP6 trigger requirement (sel_trg_Mu12)
-  sel_tmp = sel_trg_Mu12&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat;
+  sel_tmp = sel_inc&&sel_trg_Mu12&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat;
   Histos histo_pt1_vs_pt2_cat12 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_cat12",
 						       sel_tmp,sel_cen,sel_fwd,
 						       xbins,xmin,xmax,xbins,xmin,xmax);
   
   // Analysis pre-selection
-  sel_tmp = sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre;
+  sel_tmp = sel_inc&&sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre;
   Histos histo_pt1_vs_pt2_pre = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_pre",
 						     sel_tmp,sel_cen,sel_fwd,
 						     xbins,xmin,xmax,xbins,xmin,xmax);
   
   //////////
   // Analysis BDT
-  sel_tmp = sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt;
+  sel_tmp = sel_inc&&sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt;
   Histos histo_pt1_vs_pt2_bdt = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_bdt",
 						     sel_tmp,sel_cen,sel_fwd,
 						     xbins,xmin,xmax,xbins,xmin,xmax);
   // Analysis BDT with "trigger soup" requirement (sel_trg_OR)
-  sel_tmp = sel_trg_OR&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt;
+  sel_tmp = sel_inc&&sel_trg_OR&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt;
   Histos histo_pt1_vs_pt2_bdtOR = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_bdtOR",
 						       sel_tmp,sel_cen,sel_fwd,
 						       xbins,xmin,xmax,xbins,xmin,xmax);
   // Analysis BDT with Mu7_IP4 trigger requirement (sel_trg_Mu7)
-  sel_tmp = sel_trg_Mu7&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt;
+  sel_tmp = sel_inc&&sel_trg_Mu7&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt;
   Histos histo_pt1_vs_pt2_bdt7 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_bdt7",
 						      sel_tmp,sel_cen,sel_fwd,
 						      xbins,xmin,xmax,xbins,xmin,xmax);
   // Analysis BDT with Mu8_IP3 trigger requirement (sel_trg_Mu8)
-  sel_tmp = sel_trg_Mu8&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt;
+  sel_tmp = sel_inc&&sel_trg_Mu8&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt;
   Histos histo_pt1_vs_pt2_bdt8 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_bdt8",
 						      sel_tmp,sel_cen,sel_fwd,
 						      xbins,xmin,xmax,xbins,xmin,xmax);
   // Analysis BDT with Mu9_IP6 trigger requirement (sel_trg_Mu9)
-  sel_tmp = sel_trg_Mu9&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt;
+  sel_tmp = sel_inc&&sel_trg_Mu9&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt;
   Histos histo_pt1_vs_pt2_bdt9 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_bdt9",
 						      sel_tmp,sel_cen,sel_fwd,
 						      xbins,xmin,xmax,xbins,xmin,xmax);
   // Analysis BDT with Mu12_IP6 trigger requirement (sel_trg_Mu12)
-  sel_tmp = sel_trg_Mu12&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt;
+  sel_tmp = sel_inc&&sel_trg_Mu12&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt;
   Histos histo_pt1_vs_pt2_bdt12 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_bdt12",
 						       sel_tmp,sel_cen,sel_fwd,
 						       xbins,xmin,xmax,xbins,xmin,xmax);
   
   //////////
   // Low q2 req
-  sel_tmp = sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt&&sel_qsq;
+  sel_tmp = sel_inc&&sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt&&sel_qsq;
   Histos histo_pt1_vs_pt2_qsq = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_qsq",
 						     sel_tmp,sel_cen,sel_fwd,
 						     xbins,xmin,xmax,xbins,xmin,xmax);
   // Low q2 req with "trigger soup" requirement (sel_trg_OR)
-  sel_tmp = sel_trg_OR&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt&&sel_qsq;
+  sel_tmp = sel_inc&&sel_trg_OR&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt&&sel_qsq;
   Histos histo_pt1_vs_pt2_qsqOR = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_qsqOR",
 							   sel_tmp,sel_cen,sel_fwd,
 							   xbins,xmin,xmax,xbins,xmin,xmax);
   // Low q2 req with Mu7_IP4 trigger requirement (sel_trg_Mu7)
-  sel_tmp = sel_trg_Mu7&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt&&sel_qsq;
+  sel_tmp = sel_inc&&sel_trg_Mu7&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt&&sel_qsq;
   Histos histo_pt1_vs_pt2_qsq7 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_qsq7",
 							  sel_tmp,sel_cen,sel_fwd,
 							  xbins,xmin,xmax,xbins,xmin,xmax);
   // Low q2 req with Mu8_IP3 trigger requirement (sel_trg_Mu8)
-  sel_tmp = sel_trg_Mu8&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt&&sel_qsq;
+  sel_tmp = sel_inc&&sel_trg_Mu8&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt&&sel_qsq;
   Histos histo_pt1_vs_pt2_qsq8 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_qsq8",
 							  sel_tmp,sel_cen,sel_fwd,
 							  xbins,xmin,xmax,xbins,xmin,xmax);
   // Low q2 req with Mu9_IP6 trigger requirement (sel_trg_Mu9)
-  sel_tmp = sel_trg_Mu9&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt&&sel_qsq;
+  sel_tmp = sel_inc&&sel_trg_Mu9&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt&&sel_qsq;
   Histos histo_pt1_vs_pt2_qsq9 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_qsq9",
 							  sel_tmp,sel_cen,sel_fwd,
 							  xbins,xmin,xmax,xbins,xmin,xmax);
   // Low q2 req with Mu12_IP6 trigger requirement (sel_trg_Mu12)
-  sel_tmp = sel_trg_Mu12&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt&&sel_qsq;
+  sel_tmp = sel_inc&&sel_trg_Mu12&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_bdt&&sel_qsq;
   Histos histo_pt1_vs_pt2_qsq12 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_qsq12",
 							   sel_tmp,sel_cen,sel_fwd,
 							   xbins,xmin,xmax,xbins,xmin,xmax);
@@ -314,40 +317,40 @@ void histos() {
   ////////////////////////////////////////////////////////////////////////////////
 
 //  // Histos 2D ("N-1" BDT vs GEN e2 pT) after various selections
-//  sel_tmp = sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre;
+//  sel_tmp = sel_inc&&sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre;
 //  TH2F* numer_bdt_vs_pt2_sum = histo_var_vs_pt2(t,"numer_bdt_vs_pt2_sum","bdt",
 //						sel_tmp.GetTitle(),
 //						xbins,xmin,xmax,21,-5.,16.);
-//  sel_tmp = sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_cen;
+//  sel_tmp = sel_inc&&sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_cen;
 //  TH2F* numer_bdt_vs_pt2_cen = histo_var_vs_pt2(t,"numer_bdt_vs_pt2_cen","bdt",
 //						sel_tmp.GetTitle(),
 //						xbins,xmin,xmax,21,-5.,16.);
-//  sel_tmp = sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_fwd;
+//  sel_tmp = sel_inc&&sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_fwd;
 //  TH2F* numer_bdt_vs_pt2_fwd = histo_var_vs_pt2(t,"numer_bdt_vs_pt2_fwd","bdt",
 //						sel_tmp.GetTitle(),
 //						xbins,xmin,xmax,21,-5.,16.);
 //
-//  sel_tmp = sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat;
+//  sel_tmp = sel_inc&&sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat;
 //  TH2F* numer_pre_vs_pt2_sum = histo_var_vs_pt2(t,"numer_pre_vs_pt2_sum","abs(ip3d)<0.06 && cos2d>0.95",
 //						sel_tmp.GetTitle(),
 //						xbins,xmin,xmax,2,-0.5,1.5);
 //  
 //  // Histos 1D ("N-1" BDT) after various selections
-//  sel_tmp = sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre;
+//  sel_tmp = sel_inc&&sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre;
 //  TH1F numer_bdt_sum = histo_var(t,"numer_bdt_pre_sum","bdt",
 //				 sel_tmp.GetTitle(),
 //				 21,-5.,16.);
-//  sel_tmp = sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_cen;
+//  sel_tmp = sel_inc&&sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_cen;
 //  TH1F numer_bdt_cen = histo_var(t,"numer_bdt_cen","bdt",
 //				 sel_tmp.GetTitle(),
 //				 21,-5.,16.);
-//  sel_tmp = sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_fwd;
+//  sel_tmp = sel_inc&&sel_trg&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre&&sel_fwd;
 //  TH1F numer_bdt_fwd = histo_var(t,"numer_bdt_fwd","bdt",
 //				 sel_tmp.GetTitle(),
 //				 21,-5.,16.);
 //
 //  // 1D: RECO efficiency vs e2 GEN pt
-//  sel_tmp = sel_trg&&sel_kee&&sel_acc&&sel_gen;
+//  sel_tmp = sel_inc&&sel_trg&&sel_kee&&sel_acc&&sel_gen;
 //  TH1F denom_e2_gen_pt = histo_var(t,"denom_e2_gen_pt","e2_gen_pt",
 //				   sel_tmp.GetTitle(),
 //				   20,0.,10.);
@@ -357,7 +360,7 @@ void histos() {
 //				   20,0.,10.);
 //  
 //  // 1D: RECO efficiency vs e12 GEN dR
-//  sel_tmp = sel_trg&&sel_kee&&sel_acc&&sel_gen;
+//  sel_tmp = sel_inc&&sel_trg&&sel_kee&&sel_acc&&sel_gen;
 //  TH1F denom_e12_gen_dr = histo_var(t,"denom_e12_gen_dr","e12_gen_dr",
 //				    sel_tmp.GetTitle(),
 //				    20,0.,2.);
@@ -367,7 +370,7 @@ void histos() {
 //				    20,0.,2.);
 //  
 //  // GEN deltaR(e1,e2) vs GEN ele pT2
-//  sel_tmp = sel_trg&&sel_kee&&sel_acc&&sel_gen;
+//  sel_tmp = sel_inc&&sel_trg&&sel_kee&&sel_acc&&sel_gen;
 //  TH2F* denom_dr_vs_pt2 = histo_var_vs_pt2(t,"denom_dr_vs_pt2","e12_gen_dr",
 //					   sel_tmp.GetTitle(),
 //					   xbins,xmin,xmax,10,0.,2.0);
