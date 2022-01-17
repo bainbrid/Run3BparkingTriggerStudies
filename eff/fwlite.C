@@ -30,6 +30,12 @@ void fwlite() {
   // Inclusive requirement
   TCut sel_inc = "";
   
+  // Tag-side muon in GEN acceptance
+  TCut sel_tag_m1 = "m1_gen_pt>5.0 && abs(e1_gen_eta)<2.5";
+  TCut sel_tag_m2 = "m2_gen_pt>5.0 && abs(m2_gen_eta)<2.5";
+  TCut sel_tag = sel_tag_m1 || sel_tag_m2;
+  sel_tag = ""; //@@ OVERRIDE TO REMOVE TAG-SIDE REQ FOR NOW, ONLY NEEDED TO DETERMINE GEN FILTER EFF OF 0.0051
+
   // Identify B->Kee decay
   TCut sel_kee = ""; //@@ Assumes decay is always found!!!
 
@@ -53,6 +59,7 @@ void fwlite() {
   // List selections
   std::cout << "selections:" << std::endl
 	    << "  sel_inc: " << sel_inc.GetTitle() << std::endl
+	    << "  sel_tag: " << sel_tag.GetTitle() << std::endl
 	    << "  sel_kee: " << sel_kee.GetTitle() << std::endl
 	    << "  sel_acc: " << sel_acc.GetTitle() << std::endl
 	    << "  sel_gen: " << sel_gen.GetTitle() << std::endl
@@ -69,22 +76,28 @@ void fwlite() {
 						     sel_tmp,sel_cen,sel_fwd,
 						     xbins,xmin,xmax,xbins,xmin,xmax);
   
+  // Tag-side muon in GEN acceptance
+  sel_tmp = sel_inc&&sel_tag;
+  Histos histo_pt1_vs_pt2_tag = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_tag",
+						     sel_tmp,sel_cen,sel_fwd,
+						     xbins,xmin,xmax,xbins,xmin,xmax);
+
   // Find B->Kee decay?
-  sel_tmp = sel_inc&&sel_kee;
+  sel_tmp = sel_inc&&sel_tag&&sel_kee;
   Histos histo_pt1_vs_pt2_kee = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_kee",
 						     sel_tmp,sel_cen,sel_fwd,
 						     xbins,xmin,xmax,xbins,xmin,xmax);
 
   //////////
   // In GEN acc? (pT>0.5, |eta|<2.5)
-  sel_tmp = sel_inc&&sel_kee&&sel_acc;
+  sel_tmp = sel_inc&&sel_tag&&sel_kee&&sel_acc;
   Histos histo_pt1_vs_pt2_acc = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_acc",
 						     sel_tmp,sel_cen,sel_fwd,
 						     xbins,xmin,xmax,xbins,xmin,xmax);
 
   //////////
   // Additional GEN reqs (pT>2.0, |eta|<2.5)
-  sel_tmp = sel_inc&&sel_kee&&sel_acc&&sel_gen;
+  sel_tmp = sel_inc&&sel_tag&&sel_kee&&sel_acc&&sel_gen;
   Histos histo_pt1_vs_pt2_gen = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_gen",
 						     sel_tmp,sel_cen,sel_fwd,
 						     xbins,xmin,xmax,xbins,xmin,xmax);
@@ -102,6 +115,9 @@ void fwlite() {
   histo_pt1_vs_pt2_inc.sum_->Write();
   histo_pt1_vs_pt2_inc.cen_->Write();
   histo_pt1_vs_pt2_inc.fwd_->Write();
+  histo_pt1_vs_pt2_tag.sum_->Write();
+  histo_pt1_vs_pt2_tag.cen_->Write();
+  histo_pt1_vs_pt2_tag.fwd_->Write();
   histo_pt1_vs_pt2_kee.fwd_->Write();
   histo_pt1_vs_pt2_kee.cen_->Write();
   histo_pt1_vs_pt2_kee.sum_->Write();
