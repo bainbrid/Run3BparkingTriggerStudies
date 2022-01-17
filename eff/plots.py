@@ -4,270 +4,131 @@ from common import *
 ################################################################################
 # Inputs and outputs
 
-input = "latest/histos.root"
+input_2021Dec16 = "latest/histos_2021Dec16.root"
+input_2021Dec20 = "latest/histos_2021Dec20.root"
+input_incl = "latest/histos_incl.root"
+input_excl = "latest/histos_excl.root"
 output = TFile('latest/eff.root','RECREATE')
 outputs = {}
 
 ################################################################################
 # Scaling
 
-# Sample: /BuToKee_Mufilter_SoftQCDnonD_TuneCP5_13TeV-pythia8-evtgen/RunIIAutumn18MiniAOD-Custom_RK_BParking_for_RK_102X_upgrade2018_realistic_v15-v2/MINIAODSIM 
+# Default sample is BuToKee_v3:
+#  /BuToKee_Mufilter_SoftQCDnonD_TuneCP5_13TeV-pythia8-evtgen
+#  /RunIIAutumn18MiniAOD-Custom_RK_BParking_for_RK_102X_upgrade2018_realistic_v15-v2
+#  /MINIAODSIM
 # Number of MC events: 5690878
-
-# Number of these MC signal events per integrated luminosity:
-# N = L_int * XS * f_b * BF(b->muX) * BF(b->Kee) 
-#   = 41.6 [/fb] * 4.7E8 [pb] *1E3 [fb/pb] * 0.4 * 0.2 * 4.5E-7
-#   = 7.0E5
-# ... but let's normalise to 100/fb!
-# N = 7.0E5 * 100./41.6 = 1.69E6
-
-# Normalise to the number of entries in DAS
-events_processed_2021Dec16 = 4971934.
-events_processed_2021Dec20 = 3181200.
-events_processed = events_processed_2021Dec20
-events_in_DAS = 5690878.
-histo_scale = events_in_DAS/events_processed
-print("histo_scale:",histo_scale,"events_in_DAS:",events_in_DAS,"events_processed:",events_processed)
-
-# Account for GEN filter for MC signal sample = 0.0041, taken from:
+# GEN filter (pT>5,|eta|<2.5) for MC signal sample = 0.0041, taken from:
 # https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_test/PPD-RunIIFall18GS-00034
-# N(pT>5,|eta|<2.5) = 1.69E6 * 0.0041 = 6929   <-- Normalise to 6900 (2 s.f.)!
+
+# Record number of MC events from partially processed samples
+# Comment: pt1_pt2_gen_weighted distrbutions agree to within 2% for Dec16 and Dec20, so use high-stats Dec16 ...
+events_2021Dec16 = 4971934. # 98.5% complete (194/197 files), reco only
+events_2021Dec20 = 3181200. # 78.2% complete (154/197 files), reco + nano pre-sel
+events_incl = 106049.
+events_excl = 110252.
+print("events_2021Dec16:",events_2021Dec16)
+print("events_2021Dec20:",events_2021Dec20)
+print("events_incl:",events_incl)
+print("events_excl:",events_excl)
+
+# Number of B->Kee signal events per integrated luminosity:
+# N = L_int * XS * f_b * BF(b->muX) * BF(b->Kee) 
+#   = 41.6 [/fb] * 4.7E8 [pb] *1E3 [fb/pb] * 0.4 * 0.2 * 4.5E-7 = 7.0E5
+l_int = 41.6 # [/pb]
+xs = 4.7e8 * 1.e3 # [pb]
+f_b = 0.4
+bf_bmux = 0.0051 # this is b->muX with mu pT > 5 GeV and |eta| < 2.5 (i.e. not the usual 0.2)
+bf_bkee = 4.5e-7
+exp_incl = l_int * xs * f_b * (1.-(1.-bf_bkee)**2.)       # b->X (natural decay), B->Kee
+exp_2021Dec16 = l_int * xs * f_b * bf_bmux * bf_bkee * 2. # b->muX (forced decay), B->Kee, or vice verse (hence "* 2.")
+exp_2021Dec20 = exp_2021Dec16
+exp_excl = exp_2021Dec20
+
+print("exp_2021Dec16",exp_2021Dec16)
+print("exp_2021Dec20",exp_2021Dec20)
+print("exp_incl",exp_incl)
+print("exp_excl",exp_excl)
+print("temp",(1.-(1.-bf_bkee)**2.)/(bf_bmux * bf_bkee))
  
-# "lumi_scale" normalises the number of events_in_DAS to that expected from L_int (after GEN filter)
-lumi_scale = 6900. / events_in_DAS
-histo_scale *= lumi_scale
+# Determine event weight to normalise the number of MC events to that exp_2021Dec20 from L_int (after GEN filter)
+weight_2021Dec16 = exp_2021Dec16 / events_2021Dec16
+weight_2021Dec20 = exp_2021Dec20 / events_2021Dec20
+weight_incl = exp_incl / events_incl
+weight_excl = exp_excl / events_excl
+print("weight_2021Dec16:",weight_2021Dec16)
+print("weight_2021Dec20:",weight_2021Dec20)
+print("weight_incl:",weight_incl)
+print("weight_excl:",weight_excl)
 
-################################################################################
-# All numer and denom histograms for pt1_vs_pt2
-
-inputs_pt = [
-    # numer, unweighted
-    (input,"histo_pt1_vs_pt2_inc","histo_pt1_vs_pt2_inc_unweighted",None,True,1.e6),
-
-    (input,"histo_pt1_vs_pt2_trg","histo_pt1_vs_pt2_trg_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_trg_cen","histo_pt1_vs_pt2_trg_cen_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_trg_fwd","histo_pt1_vs_pt2_trg_fwd_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_trg9","histo_pt1_vs_pt2_trg9_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_trg9_cen","histo_pt1_vs_pt2_trg9_cen_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_trg9_fwd","histo_pt1_vs_pt2_trg9_fwd_unweighted",None,True,1.e6),
-
-    (input,"histo_pt1_vs_pt2_kee","histo_pt1_vs_pt2_kee_unweighted",None,True,1.e6),
-
-    (input,"histo_pt1_vs_pt2_acc","histo_pt1_vs_pt2_acc_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_acc_cen","histo_pt1_vs_pt2_acc_cen_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_acc_fwd","histo_pt1_vs_pt2_acc_fwd_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_acc9","histo_pt1_vs_pt2_acc9_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_acc9_cen","histo_pt1_vs_pt2_acc9_cen_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_acc9_fwd","histo_pt1_vs_pt2_acc9_fwd_unweighted",None,True,1.e6),
-
-    (input,"histo_pt1_vs_pt2_gen","histo_pt1_vs_pt2_gen_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_gen_cen","histo_pt1_vs_pt2_gen_cen_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_gen_fwd","histo_pt1_vs_pt2_gen_fwd_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_gen9","histo_pt1_vs_pt2_gen9_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_gen9_cen","histo_pt1_vs_pt2_gen9_cen_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_gen9_fwd","histo_pt1_vs_pt2_gen9_fwd_unweighted",None,True,1.e6),
-
-    (input,"histo_pt1_vs_pt2_sig","histo_pt1_vs_pt2_sig_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_rec","histo_pt1_vs_pt2_rec_unweighted",None,True,1.e6),
-
-    (input,"histo_pt1_vs_pt2_cat","histo_pt1_vs_pt2_cat_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_cat_cen","histo_pt1_vs_pt2_cat_cen_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_cat_fwd","histo_pt1_vs_pt2_cat_fwd_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_cat9","histo_pt1_vs_pt2_cat9_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_cat9_cen","histo_pt1_vs_pt2_cat9_cen_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_cat9_fwd","histo_pt1_vs_pt2_cat9_fwd_unweighted",None,True,1.e6),
-
-    (input,"histo_pt1_vs_pt2_pre","histo_pt1_vs_pt2_pre_unweighted",None,True,1.e6),
-
-    (input,"histo_pt1_vs_pt2_bdt","histo_pt1_vs_pt2_bdt_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_bdt_cen","histo_pt1_vs_pt2_bdt_cen_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_bdt_fwd","histo_pt1_vs_pt2_bdt_fwd_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_bdt9","histo_pt1_vs_pt2_bdt9_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_bdt9_cen","histo_pt1_vs_pt2_bdt9_cen_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_bdt9_fwd","histo_pt1_vs_pt2_bdt9_fwd_unweighted",None,True,1.e6),
-
-    (input,"histo_pt1_vs_pt2_qsq","histo_pt1_vs_pt2_qsq_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_qsq_cen","histo_pt1_vs_pt2_qsq_cen_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_qsq_fwd","histo_pt1_vs_pt2_qsq_fwd_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_qsq9","histo_pt1_vs_pt2_qsq9_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_qsq9_cen","histo_pt1_vs_pt2_qsq9_cen_unweighted",None,True,1.e6),
-    (input,"histo_pt1_vs_pt2_qsq9_fwd","histo_pt1_vs_pt2_qsq9_fwd_unweighted",None,True,1.e6),
-
-    # numer, weighted
-    (input,"histo_pt1_vs_pt2_inc","histo_pt1_vs_pt2_inc_weighted",histo_scale,True,1.e3),
-
-    (input,"histo_pt1_vs_pt2_trg","histo_pt1_vs_pt2_trg_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_trg_cen","histo_pt1_vs_pt2_trg_cen_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_trg_fwd","histo_pt1_vs_pt2_trg_fwd_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_trg9","histo_pt1_vs_pt2_trg9_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_trg9_cen","histo_pt1_vs_pt2_trg9_cen_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_trg9_fwd","histo_pt1_vs_pt2_trg9_fwd_weighted",histo_scale,True,1.e3),
-
-    (input,"histo_pt1_vs_pt2_kee","histo_pt1_vs_pt2_kee_weighted",histo_scale,True,1.e3),
-
-    (input,"histo_pt1_vs_pt2_acc","histo_pt1_vs_pt2_acc_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_acc_cen","histo_pt1_vs_pt2_acc_cen_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_acc_fwd","histo_pt1_vs_pt2_acc_fwd_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_acc9","histo_pt1_vs_pt2_acc9_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_acc9_cen","histo_pt1_vs_pt2_acc9_cen_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_acc9_fwd","histo_pt1_vs_pt2_acc9_fwd_weighted",histo_scale,True,1.e3),
-
-    (input,"histo_pt1_vs_pt2_gen","histo_pt1_vs_pt2_gen_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_gen_cen","histo_pt1_vs_pt2_gen_cen_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_gen_fwd","histo_pt1_vs_pt2_gen_fwd_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_gen9","histo_pt1_vs_pt2_gen9_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_gen9_cen","histo_pt1_vs_pt2_gen9_cen_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_gen9_fwd","histo_pt1_vs_pt2_gen9_fwd_weighted",histo_scale,True,1.e3),
-
-    (input,"histo_pt1_vs_pt2_sig","histo_pt1_vs_pt2_sig_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_rec","histo_pt1_vs_pt2_rec_weighted",histo_scale,True,1.e3),
-
-    (input,"histo_pt1_vs_pt2_cat","histo_pt1_vs_pt2_cat_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_cat_cen","histo_pt1_vs_pt2_cat_cen_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_cat_fwd","histo_pt1_vs_pt2_cat_fwd_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_cat9","histo_pt1_vs_pt2_cat9_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_cat9_cen","histo_pt1_vs_pt2_cat9_cen_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_cat9_fwd","histo_pt1_vs_pt2_cat9_fwd_weighted",histo_scale,True,1.e3),
-
-    (input,"histo_pt1_vs_pt2_pre","histo_pt1_vs_pt2_pre_weighted",histo_scale,True,1.e3),
-
-    (input,"histo_pt1_vs_pt2_bdt","histo_pt1_vs_pt2_bdt_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_bdt_cen","histo_pt1_vs_pt2_bdt_cen_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_bdt_fwd","histo_pt1_vs_pt2_bdt_fwd_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_bdt9","histo_pt1_vs_pt2_bdt9_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_bdt9_cen","histo_pt1_vs_pt2_bdt9_cen_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_bdt9_fwd","histo_pt1_vs_pt2_bdt9_fwd_weighted",histo_scale,True,1.e3),
-
-    (input,"histo_pt1_vs_pt2_qsq","histo_pt1_vs_pt2_qsq_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_qsq_cen","histo_pt1_vs_pt2_qsq_cen_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_qsq_fwd","histo_pt1_vs_pt2_qsq_fwd_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_qsq9","histo_pt1_vs_pt2_qsq9_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_qsq9_cen","histo_pt1_vs_pt2_qsq9_cen_weighted",histo_scale,True,1.e3),
-    (input,"histo_pt1_vs_pt2_qsq9_fwd","histo_pt1_vs_pt2_qsq9_fwd_weighted",histo_scale,True,1.e3),
+histos=[
+    # Section 5.3
+    (input_incl,"histo_pt1_vs_pt2_inc","hincl_pt1_vs_pt2_inc_weighted",weight_incl,True,None,1.e6,None),
+    # Section 5.4
+    (input_2021Dec16,"histo_pt1_vs_pt2_inc","his16_pt1_vs_pt2_inc_weighted",weight_2021Dec16,True,None,1.e6,None),
+    (input_2021Dec16,"histo_pt1_vs_pt2_trg9","his16_pt1_vs_pt2_trg9_weighted",weight_2021Dec16,True,None,1.e6,None), #@@ pT>2 hack in plots2.py
+    (input_2021Dec16,"histo_pt1_vs_pt2_gen9","his16_pt1_vs_pt2_gen9_weighted",weight_2021Dec16,True,None,1.e6,None),
+    (input_incl,"histo_pt1_vs_pt2_gen_cen","hincl_pt1_vs_pt2_gen_weighted",weight_incl,True,None,1.e6,None),
+    # Section 5.5
+    (input_2021Dec16,"histo_pt1_vs_pt2_gen9","his16_pt1_vs_pt2_gen9_rebinned",weight_2021Dec16,True,None,1.e6,2),
+    (input_2021Dec16,"histo_pt1_vs_pt2_cat9","his16_pt1_vs_pt2_rec9_weighted",weight_2021Dec16,True,None,1.e6,2), #@@ RECO
+    (input_2021Dec20,"histo_pt1_vs_pt2_cat9","his20_pt1_vs_pt2_nan9_weighted",weight_2021Dec20,True,None,1.e6,2), #@@ NANO
+    (input_2021Dec20,"histo_pt1_vs_pt2_pre9","his20_pt1_vs_pt2_pre9_weighted",weight_2021Dec20,True,None,1.e6,2),
+    (input_2021Dec20,"histo_pt1_vs_pt2_bdt9","his20_pt1_vs_pt2_bdt9_weighted",weight_2021Dec20,True,None,1.e6,2),
+    (input_2021Dec20,"histo_pt1_vs_pt2_qsq9","his20_pt1_vs_pt2_qsq9_weighted",weight_2021Dec20,True,None,1.e6,2),
     #
-    #(input,"histo_pt1_vs_pt2_dr","histo_pt1_vs_pt2_dr_unweighted",None,True,1.e6),
-    #(input,"histo_pt1_vs_pt2_dr","histo_pt1_vs_pt2_dr_weighted",histo_scale,True,3.e2),
-]
+    (input_2021Dec16,"histo_pt1_vs_pt2_gen_cen","his16_pt1_vs_pt2_gen_rebinned",weight_2021Dec16,True,None,1.e6,2),
+    (input_2021Dec16,"histo_pt1_vs_pt2_cat_cen","his16_pt1_vs_pt2_rec_weighted",weight_2021Dec16,True,None,1.e6,2), #@@ RECO
+    (input_2021Dec20,"histo_pt1_vs_pt2_cat_cen","his20_pt1_vs_pt2_nan_weighted",weight_2021Dec20,True,None,1.e6,2), #@@ NANO
+    (input_2021Dec20,"histo_pt1_vs_pt2_pre_cen","his20_pt1_vs_pt2_pre_weighted",weight_2021Dec20,True,None,1.e6,2),
+    (input_2021Dec20,"histo_pt1_vs_pt2_bdt_cen","his20_pt1_vs_pt2_bdt_weighted",weight_2021Dec20,True,None,1.e6,2),
+    (input_2021Dec20,"histo_pt1_vs_pt2_qsq_cen","his20_pt1_vs_pt2_qsq_weighted",weight_2021Dec20,True,None,1.e6,2),
 
-for input,name,title,scale,logy,zmax in inputs_pt:
-    print("inputs_pt:",name,title)
-    outputs[title] = writeHisto(output,input,name,title,scale,logy,zmax)
+    # Appendix
+#    (input_incl,"histo_pt1_vs_pt2_inc","hincl_pt1_vs_pt2_inc_unweighted",None,True,None,1.e6,None),
+#    (input_2021Dec20,"histo_pt1_vs_pt2_inc","his20_pt1_vs_pt2_inc_weighted",weight_2021Dec20,True,None,1.e6,None),
+#    (input_2021Dec20,"histo_pt1_vs_pt2_acc9","his20_pt1_vs_pt2_acc9_unweighted",None,True,None,1.e6,2),
+#    (input_2021Dec20,"histo_pt1_vs_pt2_trg9","his20_pt1_vs_pt2_trg9_unweighted",None,True,None,1.e6,2),
+#    #
+#    (input_2021Dec16,"histo_pt1_vs_pt2_gen_cen","his16_pt1_vs_pt2_gen_unweighted",None,True,None,1.e6,None),
+#    (input_2021Dec20,"histo_pt1_vs_pt2_gen_cen","his20_pt1_vs_pt2_gen_unweighted",None,True,None,1.e6,None),
+#    #
+#    (input_2021Dec16,"histo_pt1_vs_pt2_gen9","his16_pt1_vs_pt2_gen9_unweighted",None,True,None,1.e6,2),
+#    (input_2021Dec20,"histo_pt1_vs_pt2_gen9","his20_pt1_vs_pt2_gen9_unweighted",None,True,None,1.e6,2),
+#    (input_2021Dec16,"histo_pt1_vs_pt2_cat9","his16_pt1_vs_pt2_rec9_unweighted",None,True,None,1.e6,2), #@@ RECO
+#    (input_2021Dec20,"histo_pt1_vs_pt2_cat9","his20_pt1_vs_pt2_nan9_unweighted",None,True,None,1.e6,2), #@@ NANO
+#    (input_2021Dec20,"histo_pt1_vs_pt2_pre9","his20_pt1_vs_pt2_pre9_unweighted",None,True,None,1.e6,2),
+#    (input_2021Dec20,"histo_pt1_vs_pt2_bdt9","his20_pt1_vs_pt2_bdt9_unweighted",None,True,None,1.e6,2),
+#    (input_2021Dec20,"histo_pt1_vs_pt2_qsq9","his20_pt1_vs_pt2_qsq9_unweighted",None,True,None,1.e6,2),
+    #
+    ]
+for input,name,title,scale,logy,zmin,zmax,rebin in histos:
+    print("histos:",name,title)
+    outputs[title] = writeHisto(output,input,name,title,scale,logy,zmin,zmax,rebin=rebin)
+    writeHisto(output,input,name,title,scale,logy,zmin,zmax,xcumu="gt",ycumu="gt",rebin=rebin) # cumu plots
 
-################################################################################
-# All numer and denom histograms for bdt_vs_pt2
+effs=[
+    # Section 5.4
+    ("his16_pt1_vs_pt2_gen9_weighted","his16_pt1_vs_pt2_trg9_weighted","eff_pt1_vs_pt2_gen9_weighted",0.,1.), #@@ pT>2 hack in plots2.py
+    ("hincl_pt1_vs_pt2_gen_weighted","hincl_pt1_vs_pt2_inc_weighted","eff_pt1_vs_pt2_gen_weighted",0.,1.), #@@ pT>2 hack in plots2.py
+    # Section 5.5
+    ("his16_pt1_vs_pt2_rec9_weighted","his16_pt1_vs_pt2_gen9_rebinned","eff_pt1_vs_pt2_rec9_weighted",0.,1.), #@@ RECO
+    ("his20_pt1_vs_pt2_nan9_weighted","his16_pt1_vs_pt2_rec9_weighted","eff_pt1_vs_pt2_nan9_weighted",0.,1.), #@@ NANO
+    ("his20_pt1_vs_pt2_pre9_weighted","his20_pt1_vs_pt2_nan9_weighted","eff_pt1_vs_pt2_pre9_weighted",0.,1.),
+    ("his20_pt1_vs_pt2_bdt9_weighted","his20_pt1_vs_pt2_pre9_weighted","eff_pt1_vs_pt2_bdt9_weighted",0.,1.),
+    ("his20_pt1_vs_pt2_qsq9_weighted","his20_pt1_vs_pt2_bdt9_weighted","eff_pt1_vs_pt2_qsq9_weighted",0.,1.),
+    ("his20_pt1_vs_pt2_qsq9_weighted","his16_pt1_vs_pt2_gen9_rebinned","tot16_pt1_vs_pt2_qsq9_weighted",0.,0.2),
+    ("his16_pt1_vs_pt2_rec_weighted","his16_pt1_vs_pt2_gen_rebinned","eff_pt1_vs_pt2_rec_weighted",0.,1.),
+    ("his20_pt1_vs_pt2_nan_weighted","his16_pt1_vs_pt2_rec_weighted","eff_pt1_vs_pt2_nan_weighted",0.,1.),
+    ("his20_pt1_vs_pt2_pre_weighted","his20_pt1_vs_pt2_nan_weighted","eff_pt1_vs_pt2_pre_weighted",0.,1.),
+    ("his20_pt1_vs_pt2_bdt_weighted","his20_pt1_vs_pt2_pre_weighted","eff_pt1_vs_pt2_bdt_weighted",0.,1.),
+    ("his20_pt1_vs_pt2_qsq_weighted","his20_pt1_vs_pt2_bdt_weighted","eff_pt1_vs_pt2_qsq_weighted",0.,1.),
+    ("his20_pt1_vs_pt2_qsq_weighted","his16_pt1_vs_pt2_gen_rebinned","tot16_pt1_vs_pt2_qsq_weighted",0.,0.2),
+    # Appendix
+    ]
+for numer,denom,title,zmin,zmax in effs:
+    print("effs:",name)
+    outputs[title] = writeEffCumu(output,outputs[numer],outputs[denom],title,zmin,zmax)
 
-inputs_bdt = [
-#    # bdt_vs_pt2, unweighted
-#    (input,"numer_bdt_vs_pt2_sum","numer_bdt_vs_pt2_sum_weighted",numer_scale,True,5.e3,"gt","gt"),
-#    (input,"numer_pre_vs_pt2_sum","numer_pre_vs_pt2_sum_weighted",numer_scale,True,5.e3,"gt","gt"),
-#    #(input,"numer_bdt_vs_pt2_cen","numer_bdt_vs_pt2_cen_weighted",numer_scale,True,5.e3,"gt","gt"),
-#    #(input,"numer_bdt_vs_pt2_fwd","numer_bdt_vs_pt2_fwd_weighted",numer_scale,True,5.e3,"gt","gt"),
-#    #(input,"numer_dr_vs_pt2","numer_dr_vs_pt2_weighted",numer_scale,True,5.e3,None,"lt"),
-#    #(input,"denom_dr_vs_pt2","denom_dr_vs_pt2_weighted",numer_scale,True,5.e3,None,"lt"),
-]
-
-#for input,name,title,scale,logy,zmax,xcumu,ycumu in inputs_bdt:
-#    print("inputs_bdt:",name,xcumu,ycumu)
-#    outputs[title] = writeHisto(output,input,name,title,scale,logy,zmax,xcumu,ycumu)
-
-################################################################################
-# denom histo for bdt
-
-inputs_transform = [
-#    #("numer_bdt_vs_pt2_sum_weighted","numer_pt1_vs_pt2_gen_weighted","numer_bdt_vs_pt2_sum_weighted_transformed"),
-#    ("numer_bdt_vs_pt2_sum_weighted","numer_pt1_vs_pt2_pre_weighted","numer_bdt_vs_pt2_sum_weighted_transformed"),
-#
-#    #("numer_bdt_vs_pt2_cen_weighted","numer_pt1_vs_pt2_cen_weighted","numer_bdt_vs_pt2_cen_weighted_transformed"),
-#    #("numer_bdt_vs_pt2_fwd_weighted","numer_pt1_vs_pt2_fwd_weighted","numer_bdt_vs_pt2_fwd_weighted_transformed"),
-#
-#    #("numer_pre_vs_pt2_sum_weighted","numer_pt1_vs_pt2_gen_weighted","numer_pre_vs_pt2_sum_weighted_transformed"),
-#    ("numer_pre_vs_pt2_sum_weighted","numer_pt1_vs_pt2_cat_weighted","numer_pre_vs_pt2_sum_weighted_transformed"),
-]
-
-#for numer,denom,title in inputs_transform:
-#    print("transform_eff:",numer)
-#    outputs[title] = transformDenom(output,numer=outputs[numer],denom=outputs[denom],title=title)
-
-################################################################################
-# All efficiency histograms
-
-inputs_eff = [
-    # pt_vs_pt
-    ("histo_pt1_vs_pt2_inc_weighted","histo_pt1_vs_pt2_inc_weighted","eff_pt1_vs_pt2_inc_weighted",1.),
-
-    ("histo_pt1_vs_pt2_trg_weighted","histo_pt1_vs_pt2_inc_weighted","eff_pt1_vs_pt2_trg_weighted",1.),
-    ("histo_pt1_vs_pt2_trg_cen_weighted","histo_pt1_vs_pt2_inc_weighted","eff_pt1_vs_pt2_trg_cen_weighted",1.),
-    ("histo_pt1_vs_pt2_trg_fwd_weighted","histo_pt1_vs_pt2_inc_weighted","eff_pt1_vs_pt2_trg_fwd_weighted",1.),
-    ("histo_pt1_vs_pt2_trg9_weighted","histo_pt1_vs_pt2_inc_weighted","eff_pt1_vs_pt2_trg9_weighted",1.),
-    ("histo_pt1_vs_pt2_trg9_cen_weighted","histo_pt1_vs_pt2_inc_weighted","eff_pt1_vs_pt2_trg9_cen_weighted",1.),
-    ("histo_pt1_vs_pt2_trg9_fwd_weighted","histo_pt1_vs_pt2_inc_weighted","eff_pt1_vs_pt2_trg9_fwd_weighted",1.),
-
-    ("histo_pt1_vs_pt2_kee_weighted","histo_pt1_vs_pt2_trg_weighted","eff_pt1_vs_pt2_kee_weighted",1.),
-
-    ("histo_pt1_vs_pt2_acc_weighted","histo_pt1_vs_pt2_trg_weighted","eff_pt1_vs_pt2_acc_weighted",1.),
-    ("histo_pt1_vs_pt2_acc_cen_weighted","histo_pt1_vs_pt2_trg_weighted","eff_pt1_vs_pt2_acc_cen_weighted",1.),
-    ("histo_pt1_vs_pt2_acc_fwd_weighted","histo_pt1_vs_pt2_trg_weighted","eff_pt1_vs_pt2_acc_fwd_weighted",1.),
-    ("histo_pt1_vs_pt2_acc9_weighted","histo_pt1_vs_pt2_trg9_weighted","eff_pt1_vs_pt2_acc9_weighted",1.),
-    ("histo_pt1_vs_pt2_acc9_cen_weighted","histo_pt1_vs_pt2_trg9_cen_weighted","eff_pt1_vs_pt2_acc9_cen_weighted",1.),
-    ("histo_pt1_vs_pt2_acc9_fwd_weighted","histo_pt1_vs_pt2_trg9_fwd_weighted","eff_pt1_vs_pt2_acc9_fwd_weighted",1.),
-
-    ("histo_pt1_vs_pt2_gen_weighted","histo_pt1_vs_pt2_trg_weighted","eff_pt1_vs_pt2_gen_weighted",1.),
-    ("histo_pt1_vs_pt2_gen_cen_weighted","histo_pt1_vs_pt2_trg_weighted","eff_pt1_vs_pt2_gen_cen_weighted",1.),
-    ("histo_pt1_vs_pt2_gen_fwd_weighted","histo_pt1_vs_pt2_trg_weighted","eff_pt1_vs_pt2_gen_fwd_weighted",1.),
-    ("histo_pt1_vs_pt2_gen9_weighted","histo_pt1_vs_pt2_trg9_weighted","eff_pt1_vs_pt2_gen9_weighted",1.),
-    ("histo_pt1_vs_pt2_gen9_cen_weighted","histo_pt1_vs_pt2_trg9_cen_weighted","eff_pt1_vs_pt2_gen9_cen_weighted",1.),
-    ("histo_pt1_vs_pt2_gen9_fwd_weighted","histo_pt1_vs_pt2_trg9_fwd_weighted","eff_pt1_vs_pt2_gen9_fwd_weighted",1.),
-
-    ("histo_pt1_vs_pt2_sig_weighted","histo_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_sig_weighted",1.),
-    ("histo_pt1_vs_pt2_rec_weighted","histo_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_rec_weighted",1.),
-
-    ("histo_pt1_vs_pt2_cat_weighted","histo_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_cat_weighted",1.),
-    ("histo_pt1_vs_pt2_cat_cen_weighted","histo_pt1_vs_pt2_gen_cen_weighted","eff_pt1_vs_pt2_cat_cen_weighted",1.),
-    ("histo_pt1_vs_pt2_cat_fwd_weighted","histo_pt1_vs_pt2_gen_fwd_weighted","eff_pt1_vs_pt2_cat_fwd_weighted",1.),
-    ("histo_pt1_vs_pt2_cat9_weighted","histo_pt1_vs_pt2_gen9_weighted","eff_pt1_vs_pt2_cat9_weighted",1.),
-    ("histo_pt1_vs_pt2_cat9_cen_weighted","histo_pt1_vs_pt2_gen9_cen_weighted","eff_pt1_vs_pt2_cat9_cen_weighted",1.),
-    ("histo_pt1_vs_pt2_cat9_fwd_weighted","histo_pt1_vs_pt2_gen9_fwd_weighted","eff_pt1_vs_pt2_cat9_fwd_weighted",1.),
-
-    ("histo_pt1_vs_pt2_pre_weighted","histo_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_pre_weighted",1.),
-
-    ("histo_pt1_vs_pt2_bdt_weighted","histo_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_bdt_weighted",1.),
-    ("histo_pt1_vs_pt2_bdt_cen_weighted","histo_pt1_vs_pt2_gen_cen_weighted","eff_pt1_vs_pt2_bdt_cen_weighted",1.),
-    ("histo_pt1_vs_pt2_bdt_fwd_weighted","histo_pt1_vs_pt2_gen_fwd_weighted","eff_pt1_vs_pt2_bdt_fwd_weighted",1.),
-    ("histo_pt1_vs_pt2_bdt9_weighted","histo_pt1_vs_pt2_gen9_weighted","eff_pt1_vs_pt2_bdt9_weighted",1.),
-    ("histo_pt1_vs_pt2_bdt9_cen_weighted","histo_pt1_vs_pt2_gen9_cen_weighted","eff_pt1_vs_pt2_bdt9_cen_weighted",1.),
-    ("histo_pt1_vs_pt2_bdt9_fwd_weighted","histo_pt1_vs_pt2_gen9_fwd_weighted","eff_pt1_vs_pt2_bdt9_fwd_weighted",1.),
-
-    ("histo_pt1_vs_pt2_qsq_weighted","histo_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_qsq_weighted",1.),
-    ("histo_pt1_vs_pt2_qsq_cen_weighted","histo_pt1_vs_pt2_gen_cen_weighted","eff_pt1_vs_pt2_qsq_cen_weighted",1.),
-    ("histo_pt1_vs_pt2_qsq_fwd_weighted","histo_pt1_vs_pt2_gen_fwd_weighted","eff_pt1_vs_pt2_qsq_fwd_weighted",1.),
-    ("histo_pt1_vs_pt2_qsq9_weighted","histo_pt1_vs_pt2_gen9_weighted","eff_pt1_vs_pt2_qsq9_weighted",1.),
-    ("histo_pt1_vs_pt2_qsq9_cen_weighted","histo_pt1_vs_pt2_gen9_cen_weighted","eff_pt1_vs_pt2_qsq9_cen_weighted",1.),
-    ("histo_pt1_vs_pt2_qsq9_fwd_weighted","histo_pt1_vs_pt2_gen9_fwd_weighted","eff_pt1_vs_pt2_qsq9_fwd_weighted",1.),
-
-#    # relative efficiencies                                                                
-#    ("denom_pt1_vs_pt2_trg_weighted","denom_pt1_vs_pt2_inc_weighted","rel_pt1_vs_pt2_trg_weighted",1.),
-#    ("denom_pt1_vs_pt2_acc_weighted","denom_pt1_vs_pt2_trg_weighted","rel_pt1_vs_pt2_acc_weighted",1.),
-
-    #("numer_pt1_vs_pt2_dr_weighted","numer_pt1_vs_pt2_gen_weighted","eff_pt1_vs_pt2_dr_weighted",1.),
-                                                                                            
-#    # bdt_vs_pt
-#    ("numer_bdt_vs_pt2_sum_weighted","numer_bdt_vs_pt2_sum_weighted_transformed","eff_bdt_vs_pt2_sum_weighted",1.),
-#    #("numer_bdt_vs_pt2_cen_weighted","numer_bdt_vs_pt2_cen_weighted_transformed","eff_bdt_vs_pt2_cen_weighted",1.),
-#    #("numer_bdt_vs_pt2_fwd_weighted","numer_bdt_vs_pt2_fwd_weighted_transformed","eff_bdt_vs_pt2_fwd_weighted",1.),
-#    ("numer_pre_vs_pt2_sum_weighted","numer_pre_vs_pt2_sum_weighted_transformed","eff_pre_vs_pt2_sum_weighted",1.),
-#    # dr_vs_pt
-#    #("numer_dr_vs_pt2_weighted","denom_dr_vs_pt2_weighted","eff_dr_vs_pt2_weighted",1.),
-]
-
-for numer,denom,title,zmax in inputs_eff:
-    print("inputs_eff:",name)
-    outputs[title] = writeEffCumu(output,outputs[numer],outputs[denom],title,zmax)
-
-################################################################################
-# Outputs 
-
-print(inputs_pt)
-print(inputs_bdt)
-print(inputs_eff)
-print(outputs)
 output.Close()
