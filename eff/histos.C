@@ -249,6 +249,31 @@ void histos() {
   Histos histo_pt1_vs_pt2_pre = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_pre",
 						     sel_tmp,sel_cen,sel_fwd,
 						     xbins,xmin,xmax,xbins,xmin,xmax);
+  // Analysis pre-selection with "trigger soup" requirement (sel_trg_OR)
+  sel_tmp = sel_inc&&sel_trg_OR&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre;
+  Histos histo_pt1_vs_pt2_preOR = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_preOR",
+						       sel_tmp,sel_cen,sel_fwd,
+						       xbins,xmin,xmax,xbins,xmin,xmax);
+  // Analysis pre-selection with Mu7_IP4 trigger requirement (sel_trg_Mu7)
+  sel_tmp = sel_inc&&sel_trg_Mu7&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre;
+  Histos histo_pt1_vs_pt2_pre7 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_pre7",
+						      sel_tmp,sel_cen,sel_fwd,
+						      xbins,xmin,xmax,xbins,xmin,xmax);
+  // Analysis pre-selection with Mu8_IP3 trigger requirement (sel_trg_Mu8)
+  sel_tmp = sel_inc&&sel_trg_Mu8&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre;
+  Histos histo_pt1_vs_pt2_pre8 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_pre8",
+						      sel_tmp,sel_cen,sel_fwd,
+						      xbins,xmin,xmax,xbins,xmin,xmax);
+  // Analysis pre-selection with Mu9_IP6 trigger requirement (sel_trg_Mu9)
+  sel_tmp = sel_inc&&sel_trg_Mu9&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre;
+  Histos histo_pt1_vs_pt2_pre9 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_pre9",
+						      sel_tmp,sel_cen,sel_fwd,
+						      xbins,xmin,xmax,xbins,xmin,xmax);
+  // Analysis pre-selection with Mu12_IP6 trigger requirement (sel_trg_Mu12)
+  sel_tmp = sel_inc&&sel_trg_Mu12&&sel_kee&&sel_acc&&sel_gen&&sel_sig&&sel_rec&&sel_cat&&sel_pre;
+  Histos histo_pt1_vs_pt2_pre12 = histo_pt1_vs_pt2_all(t,"histo_pt1_vs_pt2_pre12",
+						       sel_tmp,sel_cen,sel_fwd,
+						       xbins,xmin,xmax,xbins,xmin,xmax);
   
   //////////
   // Analysis BDT
@@ -485,6 +510,21 @@ void histos() {
   histo_pt1_vs_pt2_pre.sum_->Write();
   histo_pt1_vs_pt2_pre.cen_->Write();
   histo_pt1_vs_pt2_pre.fwd_->Write();
+  histo_pt1_vs_pt2_preOR.sum_->Write();
+  histo_pt1_vs_pt2_preOR.cen_->Write();
+  histo_pt1_vs_pt2_preOR.fwd_->Write();
+  histo_pt1_vs_pt2_pre7.sum_->Write();
+  histo_pt1_vs_pt2_pre7.cen_->Write();
+  histo_pt1_vs_pt2_pre7.fwd_->Write();
+  histo_pt1_vs_pt2_pre8.sum_->Write();
+  histo_pt1_vs_pt2_pre8.cen_->Write();
+  histo_pt1_vs_pt2_pre8.fwd_->Write();
+  histo_pt1_vs_pt2_pre9.sum_->Write();
+  histo_pt1_vs_pt2_pre9.cen_->Write();
+  histo_pt1_vs_pt2_pre9.fwd_->Write();
+  histo_pt1_vs_pt2_pre12.sum_->Write();
+  histo_pt1_vs_pt2_pre12.cen_->Write();
+  histo_pt1_vs_pt2_pre12.fwd_->Write();
 
   histo_pt1_vs_pt2_bdt.sum_->Write();
   histo_pt1_vs_pt2_bdt.cen_->Write();
