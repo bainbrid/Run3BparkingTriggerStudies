@@ -65,7 +65,7 @@ if __name__ == "__main__":
   fig, ax = plt.subplots()
   etas=["eta<2.5","eta<1.2"]
   xaxis = [4,5,6,7,8,9,10,11,12,]
-  for name,pt,eta,color,his in [('pT-2GeV',2,0,"black",eff_sum),
+  for name,pt,eta,color,his in [#('pT-2GeV',2,0,"black",eff_sum),
                                 ('pT-2GeV',2,1,"blue",eff_cen),
                                 ('pT-5GeV',5,1,"green",eff_cen),
                                 ('pT-10GeV',10,1,"red",eff_cen),
@@ -79,8 +79,9 @@ if __name__ == "__main__":
       sig = eff * 40.
       bkgd = funcs[name](bdt)
       if eta==1 : bkgd /= 2.
-      #sigma = sig / np.sqrt(sig+bkgd)
-      sigma = np.sqrt( 2*((sig+bkgd)*np.log(1+sig/bkgd)-sig) )
+      # https://www.pp.rhul.ac.uk/~cowan/stat/cowan_munich16.pdf
+      #sigma = np.sqrt( 2*((sig+bkgd)*np.log(1+sig/bkgd)-sig) )
+      sigma = sig / np.sqrt(sig+bkgd)
       yaxis.append(sigma)
       print("pt:",pt,
             "xbin:",xbin,
@@ -93,9 +94,9 @@ if __name__ == "__main__":
             ) 
     ax.plot(xaxis,yaxis,color=color, marker='o',label=name+", "+etas[eta])
   ax.set_xlim(4,12)
-  ax.set_ylim(0.,10.)
-  ax.set_xlabel('MVA cut')
-  ax.set_ylabel('Significance')
+  ax.set_ylim(0.,6.)
+  ax.set_xlabel('BDT score threshold')
+  ax.set_ylabel('S/sqrt(S+B)')
   ax.legend(loc='best')
   fig.savefig('scan.pdf',bbox_inches='tight')
 
