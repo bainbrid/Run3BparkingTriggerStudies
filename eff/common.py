@@ -56,16 +56,19 @@ def getHisto(input,name,title):
 ################################################################################
 # use "gt" (greater than) or "lt" (less than) or "int" (integrate) for xcumu and ycumu
 # diag refers to whether to require ybin>xbin or not
-def cumuHisto(histo,xcumu=None,ycumu=None,diag=False):
+def cumuHisto(histo,xcumu=None,ycumu=None,diag=False,xmin=None,ymin=None):
     #print("cumuHisto:",histo,xcumu,ycumu,diag)
     if xcumu == None and ycumu == None : return histo
     cumu = histo.Clone(histo.GetName()+"_cumu")
     cumu.SetTitle(histo.GetName()+"_cumu")
     xbins = cumu.GetNbinsX()+2 # 0=underflow, n+1=overflow
     ybins = cumu.GetNbinsY()+2 # 0=underflow, n+1=overflow
+    xmin = cumu.GetXaxis().FindBin(xmin+1.e-6) if xmin is not None else 0
+    ymin = cumu.GetYaxis().FindBin(ymin+1.e-6) if ymin is not None else 0
     for xbin in range(xbins):
         for ybin in range(ybins):
             #if xbin <= 2 or ybin <= 2 : continue # hack if acceptance (_gen_) required for pT>2 only
+            if xbin < xmin or ybin < ymin : continue # hack if acceptance (_gen_) required for pT>2 only
             if diag and xbin>ybin : continue
             if xcumu is None: 
                 if ycumu is "gt" : cumu.SetBinContent(xbin,ybin,histo.Integral(xbin,xbin,ybin,ybins))
@@ -89,7 +92,7 @@ def cumuHisto(histo,xcumu=None,ycumu=None,diag=False):
 
 ################################################################################
 # 
-def drawHisto(histo,eff=False,logy=True,zmin=None,zmax=None,cumu=False):
+def drawHisto(histo,eff=False,logy=True,zmin=None,zmax=None,cumu=False,tot=None):
     canvas = TCanvas()
     canvas.cd()
     histo.Draw("TEXT COLZ")
@@ -120,6 +123,8 @@ def drawHisto(histo,eff=False,logy=True,zmin=None,zmax=None,cumu=False):
         if zmin is not None and logy is False : histo.SetMinimum(zmin)
         if zmax is not None : histo.SetMaximum(zmax)
         histo.SetMarkerSize(1.6)
+#        if not cumu and tot is not None:
+#            text.DrawLatex(0.45,0.2, "p_{T}-weighted efficiency: "+"{:4.2f}".format(tot)) 
     else: 
         gStyle.SetPaintTextFormat(".1f");
         histo.SetMinimum(0.1)
@@ -130,13 +135,13 @@ def drawHisto(histo,eff=False,logy=True,zmin=None,zmax=None,cumu=False):
         text.SetTextSize(0.03)
         if not cumu :
             #text.DrawLatex(0.6,0.25,"Integral (unweighted): {:.1f}".format(histo.GetEntries())) 
-            text.DrawLatex(0.6,0.2, "Integral: {:.1f}".format(histo.Integral())) 
+            text.DrawLatex(0.65,0.2, "Integral: {:.1f}".format(histo.Integral())) 
     if logy : canvas.SetLogz()
     return canvas
 
 ################################################################################
 # 
-def writeHisto(output,input,name,title,scale=None,logy=True,zmin=None,zmax=None,xcumu=None,ycumu=None,rebin=None):
+def writeHisto(output,input,name,title,scale=None,logy=True,zmin=None,zmax=None,xcumu=None,ycumu=None,rebin=None,xmin=None,ymin=None):
     histo = getHisto(input,name,title)
     if rebin is not None : histo.Rebin2D(rebin,rebin)
     if scale != None : histo.Scale(scale)
@@ -147,7 +152,7 @@ def writeHisto(output,input,name,title,scale=None,logy=True,zmin=None,zmax=None,
         histo.Write()
         return histo
     else :
-        cumu = cumuHisto(histo,xcumu=xcumu,ycumu=ycumu,diag=True)
+        cumu = cumuHisto(histo,xcumu=xcumu,ycumu=ycumu,diag=True,xmin=xmin,ymin=ymin)
         canvas = drawHisto(cumu,False,logy,zmin,zmax,cumu=True)
         canvas.SaveAs("latest/{:s}_cumu.pdf".format(title)) 
         output.cd()
@@ -156,10 +161,10 @@ def writeHisto(output,input,name,title,scale=None,logy=True,zmin=None,zmax=None,
 
 ################################################################################
 # 
-def writeEff(output,numer,denom,title,zmin=None,zmax=None,cumu=False):
+def writeEff(output,numer,denom,title,zmin=None,zmax=None,cumu=False,xmin=None,ymin=None):
     if cumu :
-        numer = cumuHisto(numer,xcumu="gt",ycumu="gt",diag=True)
-        denom = cumuHisto(denom,xcumu="gt",ycumu="gt",diag=True)
+        numer = cumuHisto(numer,xcumu="gt",ycumu="gt",diag=True,xmin=xmin,ymin=ymin)
+        denom = cumuHisto(denom,xcumu="gt",ycumu="gt",diag=True,xmin=xmin,ymin=ymin)
     print("title:",title)
     print("numer entries:",numer.GetBinContent(numer.GetXaxis().GetNbins(),
                                                numer.GetYaxis().GetNbins()),
@@ -171,12 +176,13 @@ def writeEff(output,numer,denom,title,zmin=None,zmax=None,cumu=False):
     eff.SetDirectory(0)
     eff.SetTitle(title)
     eff.Divide(numer,denom)
+    tot = 1. if cumu else numer.Integral() / denom.Integral()
     print("eff val      :",eff.GetBinContent(eff.GetXaxis().GetNbins(),
                                              eff.GetYaxis().GetNbins()))
     suffix = "_cumu" if cumu else ""
-    canvas = drawHisto(eff,True,False,zmin,zmax,cumu)
+    canvas = drawHisto(eff,True,False,zmin,zmax,cumu,tot)
     canvas.SaveAs("latest/{:s}{:s}.pdf".format(title,suffix)) 
-    canvas = drawHisto(eff,True,True,zmin,zmax,cumu)
+    canvas = drawHisto(eff,True,True,zmin,zmax,cumu,tot)
     canvas.SaveAs("latest/{:s}{:s}_log.pdf".format(title,suffix)) 
     output.cd()
     eff.Write()
@@ -184,8 +190,8 @@ def writeEff(output,numer,denom,title,zmin=None,zmax=None,cumu=False):
 
 ################################################################################
 # 
-def writeEffCumu(output,numer,denom,title,zmin=None,zmax=None):
-    writeEff(output,numer,denom,title,zmin,zmax,True)
+def writeEffCumu(output,numer,denom,title,zmin=None,zmax=None,xmin=None,ymin=None):
+    writeEff(output,numer,denom,title,zmin,zmax,True,xmin=xmin,ymin=ymin)
     return writeEff(output,numer,denom,title,zmin,zmax,False) # return NON-cumu plot!
 
 ################################################################################
